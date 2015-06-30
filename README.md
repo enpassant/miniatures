@@ -1,1 +1,3 @@
 # miniatures
+
+Miniature scala sources
