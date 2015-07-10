@@ -16,7 +16,11 @@ object Suit {
   }
 }
 
-sealed trait CardValue { def num: Int }
+sealed trait CardValue {
+  def num: Int
+
+  def suit(suit: Suit) = Card(this, suit)
+}
 
 case class CardNum(num: Int) extends CardValue
 
@@ -42,6 +46,13 @@ case class Card(cardValue: CardValue, suit: Suit) extends Ordered[Card] {
   import scala.math.Ordered.orderingToOrdered
   def compare(card: Card): Int =
     (suit.num, cardValue.num) compare (card.suit.num, card.cardValue.num)
+
+  def plus(card: Card) = Cards(List(this, card))
+}
+
+case class Cards(cards: List[Card]) {
+  def plus(card: Card) = copy(cards = cards ++ List(card))
+  def and(card: Card) = cards ++ List(card)
 }
 
 object Deck {
@@ -51,13 +62,15 @@ object Deck {
 
   def apply(card: Card*) = List(card :_*)
   def shuffle(deck: Deck) = deck.sortWith { (_, _) => random.nextBoolean }
+
+  def make(card: Card) = Cards(List(card))
 }
 
 object Symbolic {
   def main(args: Array[String]): Unit = {
     import Deck._
 
-    val deck = Deck(
+    val deck1 = Deck(
       Card(CardKing, Spade),
       Card(CardNum(10), Heart),
       Card(CardNum(3), Club),
@@ -66,6 +79,15 @@ object Symbolic {
       Card(CardNum(5), Club),
       Card(CardJack, Diamond)
     )
+
+    val deck =
+      (CardKing suit Spade) plus
+      (CardNum(10) suit Heart) plus
+      (CardNum(3) suit Club) plus
+      (CardQueen suit Club) plus
+      (CardNum(7) suit Club) plus
+      (CardNum(5) suit Club) and
+      (CardJack suit Diamond)
 
     println(s"Shuffled deck: ${ Deck shuffle deck }")
     println(s"Sorted deck: ${ deck.sorted }")
