@@ -15,6 +15,8 @@ package persister {
 }
 
 package authentication {
+  import persister._
+
   class Authentication(storage: persister.Storage) {
     def login = storage.read
   }
@@ -26,16 +28,16 @@ package authentication {
     }
 
     lazy val authentication = new Authentication(storage)
-    def storage: persister.Storage
+    def storage: Storage
   }
 }
 
 package persister {
-  class Database() extends persister.Storage {
+  class Database() extends Storage {
     def read = "Read from database"
   }
 
-  trait DatabaseModule extends persister.StorageModule {
+  trait DatabaseModule extends StorageModule {
     override def init = {
       super.init
       println("DatabaseModule")
@@ -46,11 +48,11 @@ package persister {
 }
 
 package persister {
-  class MemStorage() extends persister.Storage {
+  class MemStorage() extends Storage {
     def read = "Read from memory"
   }
 
-  trait MemStorageModule extends persister.StorageModule {
+  trait MemStorageModule extends StorageModule {
     override def init = {
       super.init
       println("MemStorageModule")
@@ -61,11 +63,12 @@ package persister {
 }
 
 object DI extends App {
-  val databaseModules = new authentication.AuthenticationModule
-    with persister.DatabaseModule
+  import authentication._
+  import persister._
 
-  val memoryModules = new authentication.AuthenticationModule
-    with persister.MemStorageModule
+  val databaseModules = new AuthenticationModule with DatabaseModule
+
+  val memoryModules = new AuthenticationModule with MemStorageModule
 
   memoryModules.init
   databaseModules.init
