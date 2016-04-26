@@ -15,6 +15,8 @@ object Tank extends App {
   def balra = 90
   def jobbra = -90
 
+  def kiír(msg: Any) = println(msg)
+
   val tank = Tank(50, 50) fordul balra előre 10 fordul jobbra hátra 10
-  println(tank)
+  kiír(tank)
 }
