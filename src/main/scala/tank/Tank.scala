@@ -18,12 +18,12 @@ object Tank {
   val előre = (l: Int) => (tank: Tank) => tank.előre(l)
   val hátra = (l: Int) => (tank: Tank) => tank.előre(-l)
   val fordul = (dr: Int) => (tank: Tank) => tank.fordul(dr)
-
-  def kiír(msg: Any) = println(msg)
 }
 
 object TankApp extends App {
   import Tank._
+
+  def kiír(msg: Any) = println(msg)
 
   val tank = Tank(50, 50)
   val tank2 = tank fordul balra előre 10 fordul jobbra hátra 10
@@ -32,4 +32,9 @@ object TankApp extends App {
   val mozgás = fordul(balra) andThen előre(10) andThen fordul(jobbra) andThen hátra(10)
   val tank3 = mozgás(tank)
   kiír(tank3)
+
+  val mozgásLista = Seq(fordul(balra), előre(10), fordul(jobbra), hátra(10))
+  val mozgás2 = mozgásLista reduce { _ andThen _ }
+  val tank4 = mozgás2(tank)
+  kiír(tank4)
 }
