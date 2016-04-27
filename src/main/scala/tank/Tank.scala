@@ -11,12 +11,25 @@ case class Tank(x: Int, y: Int, d: Int = 0) {
   def fordul(dr: Int) = Tank(x, y, (d + dr) % 360)
 }
 
-object Tank extends App {
+object Tank {
   def balra = 90
   def jobbra = -90
 
-  def kiír(msg: Any) = println(msg)
+  val előre = (l: Int) => (tank: Tank) => tank.előre(l)
+  val hátra = (l: Int) => (tank: Tank) => tank.előre(-l)
+  val fordul = (dr: Int) => (tank: Tank) => tank.fordul(dr)
 
-  val tank = Tank(50, 50) fordul balra előre 10 fordul jobbra hátra 10
-  kiír(tank)
+  def kiír(msg: Any) = println(msg)
+}
+
+object TankApp extends App {
+  import Tank._
+
+  val tank = Tank(50, 50)
+  val tank2 = tank fordul balra előre 10 fordul jobbra hátra 10
+  kiír(tank2)
+
+  val mozgás = fordul(balra) andThen előre(10) andThen fordul(jobbra) andThen hátra(10)
+  val tank3 = mozgás(tank)
+  kiír(tank3)
 }
