@@ -19,8 +19,8 @@ object ShapeOO {
 
   case class Circle(point: Point, radius: Int) extends Shape {
     def draw(display: Display, amount: Int): String = {
-      if (amount < 50) {
-        s"Minimum amount is 50, you have only $amount"
+      if (amount < 100) {
+        s"Minimum amount is 100, you have only $amount"
       } else if (amount >= 500) {
         s"Drawing expensive circle at (${point.x}, ${point.y}) Radius: $radius"
       } else {
@@ -28,8 +28,13 @@ object ShapeOO {
       }
     }
 
-    def draw(printer: Printer, amount: Int): String =
-      s"Printing circle at (${point.x}, ${point.y}) Radius: $radius"
+    def draw(printer: Printer, amount: Int): String = {
+      if (amount < 75) {
+        s"Minimum amount is 75, you have only $amount"
+      } else {
+        s"Printing circle at (${point.x}, ${point.y}) Radius: $radius"
+      }
+    }
 
     def sideCount() = 1
 
@@ -46,21 +51,25 @@ object ShapeOO {
   }
 
   case class Rectangle(point: Point, width: Int, height: Int, smoothing: Int = 0) extends Shape {
-    def draw(display: Display, amount: Int): String =
-      if (amount < 50) {
-        s"Minimum amount is 50, you have only $amount"
+    def draw(display: Display, amount: Int): String = {
+      if (amount < 100) {
+        s"Minimum amount is 100, you have only $amount"
       } else smoothing match {
         case 0 => drawRectangle(display)
         case 100 => Ellipse(point, width, height).draw(display, amount)
         case _ => drawRoundedRectangle(display)
       }
+    }
 
-    def draw(printer: Printer, amount: Int): String =
-      smoothing match {
+    def draw(printer: Printer, amount: Int): String = {
+      if (amount < 75) {
+        s"Minimum amount is 75, you have only $amount"
+      } else smoothing match {
         case 0 => printRectangle(printer)
         case 100 => Ellipse(point, width, height).draw(printer, amount)
         case _ => printRoundedRectangle(printer)
       }
+    }
 
     private def drawRectangle(display: Display): String =
       s"Drawing rectangle at (${point.x}, ${point.y}) Width $width, Height $height"
@@ -92,14 +101,19 @@ object ShapeOO {
 
   case class Ellipse(point: Point, width: Int, height: Int) extends Shape {
     def draw(display: Display, amount: Int): String =
-      if (amount < 50) {
-        s"Minimum amount is 50, you have only $amount"
+      if (amount < 100) {
+        s"Minimum amount is 100, you have only $amount"
       } else {
         s"Drawing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
       }
 
-    def draw(printer: Printer, amount: Int): String =
-      s"Printing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
+    def draw(printer: Printer, amount: Int): String = {
+      if (amount < 75) {
+        s"Minimum amount is 75, you have only $amount"
+      } else {
+        s"Printing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
+      }
+    }
 
     def sideCount() = 1
 
