@@ -12,54 +12,59 @@ object ShapePF {
   case class Rectangle(point: Point, width: Int, height: Int, smoothing: Int = 0) extends Shape
   case class Ellipse(point: Point, width: Int, height: Int) extends Shape
 
-  type ExportShape = PartialFunction[(Device, Shape), String]
+  type ExportShape = PartialFunction[(Device, Shape, Int), String]
   type ReformShape = PartialFunction[Shape, Shape]
 
   val drawCircle: ExportShape = {
-    case (Display(), Circle(point, radius)) =>
+    case (Display(), Circle(point, radius), _) =>
       s"Drawing circle at (${point.x}, ${point.y}) Radius: $radius"
   }
 
   val drawRectangle: ExportShape = {
-    case (Display(), Rectangle(point, width, height, _)) =>
+    case (Display(), Rectangle(point, width, height, _), _) =>
       s"Drawing rectangle at (${point.x}, ${point.y}) Width $width, Height $height"
   }
 
   val drawEllipse: ExportShape = {
-    case (Display(), Ellipse(point, width, height)) =>
+    case (Display(), Ellipse(point, width, height), _) =>
       s"Drawing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
   }
 
   val drawRoundedRectangle: ExportShape = {
-    case (Display(), Rectangle(point, width, height, smoothing)) if smoothing > 0 =>
+    case (Display(), Rectangle(point, width, height, smoothing), _) if smoothing > 0 =>
       s"Drawing rounded rectangle at (${point.x}, ${point.y}) " +
         s"Width $width, Height $height, Smoothing $smoothing"
   }
 
   val printCircle: ExportShape = {
-    case (Printer(_), Circle(point, radius)) =>
+    case (Printer(_), Circle(point, radius), _) =>
       s"Printing circle at (${point.x}, ${point.y}) Radius: $radius"
   }
 
   val printRectangle: ExportShape = {
-    case (Printer(_), Rectangle(point, width, height, _)) =>
+    case (Printer(_), Rectangle(point, width, height, _), _) =>
       s"Printing rectangle at (${point.x}, ${point.y}) Width $width, Height $height"
   }
 
   val printEllipse: ExportShape = {
-    case (Printer(_), Ellipse(point, width, height)) =>
+    case (Printer(_), Ellipse(point, width, height), _) =>
       s"Printing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
   }
 
   val printRoundedRectangle: ExportShape = {
-    case (Printer(_), Rectangle(point, width, height, smoothing)) if smoothing > 0 =>
+    case (Printer(_), Rectangle(point, width, height, smoothing), _) if smoothing > 0 =>
       s"Printing rounded rectangle at (${point.x}, ${point.y}) " +
         s"Width $width, Height $height, Smoothing $smoothing"
   }
 
   val printEpsonCircle: ExportShape = {
-    case (Printer("Epson"), Circle(point, radius)) =>
+    case (Printer("Epson"), Circle(point, radius), _) =>
       s"[Epson] Printing circle at (${point.x}, ${point.y}) Radius: $radius"
+  }
+
+  val drawExpensiveCircle: ExportShape = {
+    case (Display(), Circle(point, radius), amount) if amount >= 500 =>
+      s"Drawing an expensive circle at (${point.x}, ${point.y}) Radius: $radius"
   }
 
   val reform: ReformShape = {
@@ -70,24 +75,38 @@ object ShapePF {
   }
 
   val applyReform: (ExportShape, ReformShape) => ExportShape = (export, reform) => {
-    case (device: Device, shape: Shape) if export.isDefinedAt(device, shape) =>
+    case (device, shape, amount) if export.isDefinedAt(device, shape, amount) =>
       if (reform.isDefinedAt(shape)) {
         val reformedShape = reform(shape)
-        if (export.isDefinedAt(device, reformedShape)) {
-          applyReform(export, reform)(device, reformedShape)
+        if (export.isDefinedAt(device, reformedShape, amount)) {
+          applyReform(export, reform)(device, reformedShape, amount)
         } else {
-          export(device, shape)
+          export(device, shape, amount)
         }
       } else {
-        export(device, shape)
+        export(device, shape, amount)
       }
   }
 
   val exportUnknown: ExportShape = {
-    case (device, shape) => s"Unknown device $device or shape $shape"
+    case (device, shape, amount) => s"Unknown device $device or shape $shape"
   }
 
-  val draw = drawCircle orElse drawEllipse orElse drawRoundedRectangle orElse drawRectangle
+  val minAmount: Int => ExportShape = (minimum) => {
+    case (_, _, amount: Int) if amount < minimum =>
+      s"Minimum amount is $minimum, you have only $amount"
+  }
+
+  val compose: (ExportShape, ExportShape) => ExportShape = (export, filter) => {
+    case (device, shape, amount) if export.isDefinedAt(device, shape, amount) &&
+      filter.isDefinedAt(device, shape, amount) =>
+        filter(device, shape, amount)
+    case (device, shape, amount) if export.isDefinedAt(device, shape, amount) =>
+      export(device, shape, amount)
+  }
+
+  val draw = drawExpensiveCircle orElse drawCircle orElse drawEllipse orElse
+    drawRoundedRectangle orElse drawRectangle
   val draw1 = drawRectangle
   val draw2 = drawRoundedRectangle orElse drawRectangle
   val draw3 = drawEllipse orElse drawRoundedRectangle orElse drawRectangle
@@ -107,7 +126,15 @@ object ShapePF {
   val printWithReform2 = applyReform(print2, reform) orElse exportUnknown
   val printWithReform3 = applyReform(print3, reform) orElse exportUnknown
 
-  val export = draw orElse printEpsonCircle orElse print
+  val export = minAmount(10) orElse draw orElse printEpsonCircle orElse print
+
+  val exportAmount = compose(draw, minAmount(100)) orElse
+    compose(printEpsonCircle, minAmount(50)) orElse
+    compose(print, minAmount(75))
+
+  val exportHighAmount = compose(draw, minAmount(1000)) orElse
+    compose(printEpsonCircle, minAmount(500)) orElse
+    compose(print, minAmount(750))
 
   val exportWithReform = applyReform(export, reform) orElse exportUnknown
 
