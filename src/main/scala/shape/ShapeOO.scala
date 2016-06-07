@@ -3,17 +3,26 @@ package shape
 object ShapeOO {
   case class Point(x: Int, y: Int)
 
+  sealed trait Device
+  case class Display() extends Device
+  case class Printer(brand: String = "GENERAL") extends Device
+
   sealed trait Shape {
     def point: Point
-    def draw: String
+    def draw(device: Device): String = this.draw(device)
+    def draw(display: Display): String
+    def draw(printer: Printer): String
     def sideCount(): Int
     def removeSmoothing(): Shape
     def reform(clazz: Class[_]): Option[Shape]
   }
 
   case class Circle(point: Point, radius: Int) extends Shape {
-    def draw: String =
+    def draw(display: Display): String =
       s"Drawing circle at (${point.x}, ${point.y}) Radius: $radius"
+
+    def draw(printer: Printer): String =
+      s"Printing circle at (${point.x}, ${point.y}) Radius: $radius"
 
     def sideCount() = 1
 
@@ -30,17 +39,32 @@ object ShapeOO {
   }
 
   case class Rectangle(point: Point, width: Int, height: Int, smoothing: Int = 0) extends Shape {
-    def draw: String = smoothing match {
-      case 0 => drawRectangle
-      case 100 => Ellipse(point, width, height).draw
-      case _ => drawRoundedRectangle
-    }
+    def draw(display: Display): String =
+      smoothing match {
+        case 0 => drawRectangle(display)
+        case 100 => Ellipse(point, width, height).draw(display)
+        case _ => drawRoundedRectangle(display)
+      }
 
-    private def drawRectangle: String =
+    def draw(printer: Printer): String =
+      smoothing match {
+        case 0 => printRectangle(printer)
+        case 100 => Ellipse(point, width, height).draw(printer)
+        case _ => printRoundedRectangle(printer)
+      }
+
+    private def drawRectangle(display: Display): String =
       s"Drawing rectangle at (${point.x}, ${point.y}) Width $width, Height $height"
 
-    private def drawRoundedRectangle: String =
+    private def drawRoundedRectangle(display: Display): String =
       s"Drawing rounded rectangle at (${point.x}, ${point.y}) " +
+        s"Width $width, Height $height, Smoothing $smoothing"
+
+    private def printRectangle(printer: Printer): String =
+      s"Printing rectangle at (${point.x}, ${point.y}) Width $width, Height $height"
+
+    private def printRoundedRectangle(printer: Printer): String =
+      s"Printing rounded rectangle at (${point.x}, ${point.y}) " +
         s"Width $width, Height $height, Smoothing $smoothing"
 
     def sideCount() = if (smoothing > 0) 1 else 4
@@ -58,8 +82,11 @@ object ShapeOO {
   }
 
   case class Ellipse(point: Point, width: Int, height: Int) extends Shape {
-    def draw: String =
+    def draw(display: Display): String =
       s"Drawing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
+
+    def draw(printer: Printer): String =
+      s"Printing ellipse at (${point.x}, ${point.y}) Width $width, Height $height"
 
     def sideCount() = 1
 
