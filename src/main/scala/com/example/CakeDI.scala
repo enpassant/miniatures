@@ -62,7 +62,7 @@ package persister {
   }
 }
 
-object DI extends App {
+object CakeDI extends App {
   import authentication._
   import persister._
 
