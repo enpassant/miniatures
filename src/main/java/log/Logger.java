@@ -5,9 +5,20 @@ import java.io.InputStreamReader;
 import java.util.function.Function;
 
 class Logger {
+    private static String loggedClassName;
     private final Class currentClass;
 
-    public Logger(final Class currentClass) {
+    public static void config(final String[] args) {
+        if (args.length >= 1) {
+            loggedClassName = args[0];
+        }
+    }
+
+    public static Logger getLogger(final Class loggedClass) {
+        return new Logger(loggedClass);
+    }
+
+    private Logger(final Class currentClass) {
         this.currentClass = currentClass;
     }
 
@@ -26,17 +37,6 @@ class Logger {
     private void debugInternal(final String method, final String message) {
         System.err.println("[" + currentClass.getName()
             + "." + method + "] " + message);
-    }
-
-    private static String loggedClassName;
-    public static void config(final String[] args) {
-        if (args.length >= 1) {
-            loggedClassName = args[0];
-        }
-    }
-
-    public static Logger getLogger(final Class loggedClass) {
-        return new Logger(loggedClass);
     }
 
     public static <I, O> Function<I, O> makeLogged(

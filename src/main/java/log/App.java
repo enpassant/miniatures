@@ -20,7 +20,7 @@ class App {
         ).andThen(
             (o -> o.map(n -> n * n))
         ).andThen(Logger.makeLogged(App.class, "process",
-            (o -> o.map(n -> n.toString())))
+            (o -> o.map(n -> "Response: " + n)))
         ).andThen(
             (o -> o.orElse("Parse error"))
         );
@@ -34,10 +34,9 @@ class App {
                     System.out.println("Exit!");
                     break;
                 }
-                final String response = process2.apply(request);
-                System.out.println("response : " + response);
+                final String response = process.apply(request);
+                System.out.println(response);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -49,6 +48,5 @@ class App {
                 }
             }
         }
-
     }
 }

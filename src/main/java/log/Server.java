@@ -11,7 +11,8 @@ class Server {
         //}
 
         final int number = Integer.parseInt(request);
-        final String output = Integer.toString(number * number);
+        final int square = number * number;
+        final String output = "Response: " + square;
         //if (logger.isDebugEnabled()) {
             //logger.debug("response: " + output);
         //}
