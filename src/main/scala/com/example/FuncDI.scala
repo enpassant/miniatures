@@ -62,11 +62,19 @@ object Store {
   }
 }
 
+case class Config(logged: Boolean)
+
 object FuncDI extends App {
   import Store._
   import StoreAPI._
   import DatabaseAPI._
   import MemDatabase._
+
+  var config: Config = _
+
+  lazy val getItemFn =
+    if (config.logged) makeLogged(getItem) _
+    else getItem
 
   val orderRequest1 = OrderRequest(Order("ORD_01", "IBM",
     List(
@@ -80,7 +88,9 @@ object FuncDI extends App {
       OrderedItem("005", 2.0)
     )))
 
-  val placeOrderMemDB = placeOrderBusinessLogic(getItem, saveOrder)
+  config = Config(false)
+
+  val placeOrderMemDB = placeOrderBusinessLogic(getItemFn, saveOrder)
 
   println(placeOrderMemDB(orderRequest1).toString)
   println(placeOrderMemDB(orderRequest2).toString)
