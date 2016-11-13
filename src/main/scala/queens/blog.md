@@ -141,7 +141,7 @@ Sajnos ez a rossz hír, a jó hír viszont az, hogy sokkal hatékonyabbá tehet�
 
 Mi a különbség a jó programozó és a rossz programozó között?
 
-A jó programozó **LUSTA**! ;)
+A jó programozó **LUSTA**! ;-)
 Ez egyébként sok más gondolkodást igénylő szakmára igaz, pl. a matematikusra is.
 
 ### Mit is jelent az, hogy lusta?
@@ -172,7 +172,7 @@ Ha ezt felismertük, akkor már könnyű dolgunk van. Tegyük a javított brute-
     (qi != qj) && math.abs(qi - qj) != j
 ```
 
-Ha így futtatjuk le az algoritmusunkat, akkor eredményül egy Stream-et kapunk, de úgy, hogy egyetlen árva lépést sem csinál meg az algoritmusból. Ez valóban lusta lett :;
+Ha így futtatjuk le az algoritmusunkat, akkor eredményül egy Stream-et kapunk, de úgy, hogy egyetlen árva lépést sem csinál meg az algoritmusból. Ez valóban lusta lett ;-)
 ``` scala
   lazy val solutions = allSolution(4, 4) //semmit nem csinál
 ```
