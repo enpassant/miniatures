@@ -12,6 +12,7 @@ A nyolckirálynő-probléma egy sakkfeladvány, lényege a következő: hogyan i
 A nyolckirálynő-probléma egy példa az ennél általánosabb „n királynő problémára”, ami azt a kérdést veti fel, hányféleképpen lehet lerakni n darab királynőt egy n×n-es táblán.
 
 A [Wikipédia angol nyelvű verziójában](https://en.wikipedia.org/wiki/Eight_queens_puzzle) különböző megoldási javaslatokat is látunk, pl.:
+
 1. Brute-force keresés, ahol legeneráljuk az összes olyan esetet, ahogyan a 8 királynőt fel lehet helyezni a táblára, majd kiszűrjük közülük a helyes megoldásokat.
 2. Javított brute-force keresés, ahol minden sorba csak egy királynőt teszünk. Számunkra ez lesz az egyik érdekes megoldás, mert elég könnyű megcsinálni, de nem elég hatékony.
 3. A másik számunkra érdekes megoldás a visszalépéses (backtrack) mélységi keresés. Ez még hatékonyabb, mint a 2. megoldás, de nehezebb megcsinálni.
@@ -143,16 +144,16 @@ Mi a különbség a jó programozó és a rossz programozó között?
 A jó programozó **LUSTA**! ;)
 Ez egyébként sok más gondolkodást igénylő szakmára igaz, pl. a matematikusra is.
 
-Mit is jelent az, hogy lusta?
+### Mit is jelent az, hogy lusta?
 
 Most azt nevezzük lustának, ha valaki a rá bízott feladat végrehajtását addig az utolsó időpontig elhalasztja, ameddig csak lehetséges. Pl. ha valaki kap egy két nap időráfordítást igénylő feladatot és van rá öt napja, hogy elkészítse, akkor három napig pihen, majd az utolsó két napban megcsinálja. A szorgalmas ezzel szemben azonnal megcsinálja és három napig pihen utána.
 
-Miért is jó, ha lusta?
+### Miért is jó, ha lusta?
 
 Ha pont annyi vagy kevesebb feladatot kap valaki, mint amennyit el tud adott idő alatt végezni, akkor nincs nagy különbség a lusta és szorgalmas között, azt leszámítva, hogy az egyik az elején pihen, a másik a végén, de mind a kettő elvégzi a munkáját rendesen.
 Ha viszont több feladatot kap, mint amennyit el tud végezni, akkor pedig mind a kettő ugyanannyit késik, mint a másik. Hol itt a különbség?
 
-A különbség az elvégzett munka sorrendjében van.
+#### A különbség az elvégzett munka sorrendjében van.
 
 Míg a szorgalmas szépen csinálja egymás után a feladatait, amíg nem végez, a lusta ezzel szemben mindig csak azt a feladatát csinálja, ami már végképp nem tűr halasztást, így a lusta a kitűzött idő alatt a legfontosabb munkáit megcsinálta, míg a szorgalmas nem. Hasonlóan, mint a visszalépéses keresés algoritmus és a javított brute-force algoritmus. A visszalépéses olyan, mint a lusta, már a 8. lépésben megtalálja az első megoldást, a javított brute-force pedig olyan, mint a szorgalmas, csak az utolsó lépésekben.
 
