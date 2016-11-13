@@ -31,50 +31,38 @@ A [Wikipédia angol nyelvű verziójában](https://en.wikipedia.org/wiki/Eight_q
 
 Mivel egy sorba csak egy királynő kerülhet, ezért a (rész)megoldásunkat megadhatjuk egy listával, ahol minden egyes elem azt mutatja, hogy az adott sorban hányadik oszlopban szerepel a királynő. Ha 0-tól kezdjük az indexelést, akkor az induló állást így jelölhetjük: (), az 1. pontban levőt így (0), egy megoldást pedig így (1, 3, 0, 2), ezt nézzük meg a sakktáblán is:
 
-<svg style="stroke-width:1;stroke:rgb(0,0,0)">
-    <rect width="120" height="120" x="20" style="fill:none"/>
-    <line x1="20" y1="30" x2="140" y2="30"/>
-    <line x1="20" y1="60" x2="140" y2="60"/>
-    <line x1="20" y1="90" x2="140" y2="90"/>
-    <line x1="50" y1="0" x2="50" y2="120"/>
-    <line x1="80" y1="0" x2="80" y2="120"/>
-    <line x1="110" y1="0" x2="110" y2="120"/>
-    <text x="50" y="25" style="font-size:2em">♕</text>
-    <text x="110" y="55" style="font-size:2em">♕</text>
-    <text x="20" y="85" style="font-size:2em">♕</text>
-    <text x="80" y="115" style="font-size:2em">♕</text>
-</svg>
+0 | 1 | 2 | 3
+:-: | :-: | :-: | :-:
+  | ♕ |  |   
+  |   |    | ♕ |
+♕ |   |  |   
+  |   | ♕ |   
 
 #### Algoritmus futása
 
 Menjünk végig az algoritmuson és jegyezzük fel az egyes részmegoldásokat!
 
-(0)
-A következő sorban nem jó a 0. pozícióban sem, az 1.-ben sem így marad a:
-(0, 2)
-A következő sorban egyik oszlopba se helyezhetjük a vezért, ezért visszalépünk és továbbrakjuk a vezérünket:
-(0, 3)
-A következő sorban nem jó a 0. oszlop, de jó az 1.:
-(0, 3, 1)
-Sajnos az utolsó sorban nem jó megint egyik sem visszalépünk a 2. sorra.
-Ott sem jó sem a 2., sem a 3. oszlop, ezért visszalépünk az. 1. sorra.
-Ott már nincs több oszlop, ezért visszalépünk a 0. sorra, ott továbbrakjuk a vezért:
-(1)
-A következő sorban jó a 3. oszlop:
-(1, 3)
-A következő sorban mindjárt a 0. jó:
-(1, 3, 0)
-És jön az első megoldásunk:
-(1, 3, 0, 2) *
-Ha folytatjuk az algoritmust, akkor kapjuk a további (rész)megoldásokat:
-(2)
-(2, 0)
-(2, 0, 3)
-(2, 0, 3, 1) *
-(3)
-(3, 0)
-(3, 0, 2)
-(3, 1)
+Lépés | (rész)megoldás
+----  | ---:
+Indulás | (0)
+A következő sorban nem jó a 0. pozícióban sem, az 1.-ben sem így marad a | (0, 2)
+A következő sorban egyik oszlopba se helyezhetjük a vezért, ezért visszalépünk és továbbrakjuk a vezérünket | (0, 3)
+A következő sorban nem jó a 0. oszlop, de jó az 1. | (0, 3, 1)
+Sajnos az utolsó sorban nem jó megint egyik sem visszalépünk a 2. sorra. |
+Ott sem jó sem a 2., sem a 3. oszlop, ezért visszalépünk az. 1. sorra. |
+Ott már nincs több oszlop, ezért visszalépünk a 0. sorra, ott továbbrakjuk a vezért | (1)
+A következő sorban jó a 3. oszlop | (1, 3)
+A következő sorban mindjárt a 0. jó | (1, 3, 0)
+És jön az első megoldásunk | (1, 3, 0, 2) *
+Ha folytatjuk az algoritmust, akkor vissza kell lépni egészen az első sorig | (2)
+Következő sorból jó a 0. | (2, 0)
+Következő sorból jó a 3. | (2, 0, 3)
+Következő sorból jó a 1. Újabb megoldás | (2, 0, 3, 1) *
+Visszalépünk az elejére | (3)
+Következő sorból jó a 0. | (3, 0)
+Következő sorból jó a 2. | (3, 0, 2)
+Visszalépés kétszer | (3, 1)
+Visszalépünk egészen a 0. sor elé | vége
 
 Vége az algoritmusnak, nincs több megoldás, összesen kettőt találtunk.
 
@@ -100,8 +88,8 @@ def allSolution(n: Int, i: Int): Seq[Seq[Int]] =
 ```
 Nézzük meg mit jelent egy (rész)megoldás kiterjesztése!
 ```
-(n oszlopból álló) megoldás kiterjesztése megegyezik azzal, hogy
-az n oszlop közül kiszűjük azokat, amik felvehetők és ezeket az eddigi megoldáshoz fűzzük
+A megoldás kiterjesztése (n oszlopból álló) megegyezik azzal, hogy
+az n oszlop közül kiszűrjük azokat, amik felvehetők és ezeket az eddigi megoldáshoz fűzzük
 ```
 A Scala-s megoldásban praktikus okokból itt nem a végére rakjuk az új, felvehető oszlop indexeket, hanem az elejére.
 ``` scala
@@ -110,7 +98,7 @@ def extendSolution(n: Int)(qs: Seq[Int]) =
 ```
 Felvehető oszlop
 ```
-Felvehető egy (rész)megoldás esetén az új sorba egy q. oszlopba a vezér megegyezik azzal, hogy
+Felvehető egy vezér ((rész)megoldás esetén, az új sor egy q. oszlopába) megegyezik azzal, hogy
 a részmegoldás minden vezérének pozíciója nem fenyegeti az új sor, q. oszlopába felveendő vezért
 ```
 ``` scala
