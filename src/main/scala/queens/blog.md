@@ -90,7 +90,7 @@ def allSolution(n: Int, i: Int): Seq[Seq[Int]] =
 Nézzük meg mit jelent egy (rész)megoldás kiterjesztése!
 ```
 A megoldás kiterjesztése (n oszlopból álló) megegyezik azzal, hogy
-az n oszlop közül kiszűrjük azokat, amik felvehetők és ezeket az eddigi megoldáshoz fűzzük
+  az n oszlop közül kiszűrjük azokat, amik felvehetők és ezeket az eddigi megoldáshoz fűzzük
 ```
 A Scala-s megoldásban praktikus okokból itt nem a végére rakjuk az új, felvehető oszlop indexeket, hanem az elejére.
 ``` scala
@@ -100,7 +100,7 @@ def extendSolution(n: Int)(qs: Seq[Int]) =
 Felvehető oszlop
 ```
 Felvehető egy vezér ((rész)megoldás esetén, az új sor egy q. oszlopába) megegyezik azzal, hogy
-a részmegoldás minden vezérének pozíciója nem fenyegeti az új sor, q. oszlopába felveendő vezért
+  a részmegoldás minden vezérének pozíciója nem fenyegeti az új sor, q. oszlopába felveendő vezért
 ```
 ``` scala
 def okToAdd(qs: Seq[Int])(q: Int) =
@@ -110,7 +110,7 @@ Magyarázat az előzőhöz: mivel a (rész)megoldásoknál csak az oszlopszámot
 Végül nézzük mikor nem fenyeget egy vezér egy másikat!
 ```
 Egy vezér (qi, i) pozícióban  nem fenyeget egy másikat (qj, j) pozícióban, ha
-nincsenek ugyanabban az oszlopban és nincsenek ugyanabban az átlóban
+  nincsenek ugyanabban az oszlopban és nincsenek ugyanabban az átlóban
 ```
 ``` scala
 val notThreaten = (qi: Int, i: Int) => (qj: Int, j: Int) =>
