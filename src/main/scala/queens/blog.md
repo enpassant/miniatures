@@ -192,4 +192,26 @@ Ha másodszorra két megoldást kérünk el, akkor folytatja a keresést ott, ah
   solutions.take(2).toList
 ```
 
+Ennek a megoldásnak még további előnye, hogy rugalmasan felhasználható. Láttuk, hogy könnyen elkérhetjük az első, a második, vagy akár az öesszes megoldást. Ezen túlmenően még olyan extrém elvárást is könnyen megoldhatunk, mint pl. olyan három megoldás érdekel, amelyiknél az 1., 5. és 7. sorban levő királynő oszloppozícióinak szorzata nagyobb, mint 80:
+
+``` scala
+  lazy val solutions = allSolution(8, 8)
+  solutions filter (s => s(1) * s(5) * s(7) > 80) take 3
+```
+Ezt az imperatív megoldásnál csak nagy átalakítások után tudnánk elérni.
+
+#### Előnyei az imperatív megoldással szemben
+
+- Rövid, egyszerű megoldás
+- Könnyen érthető
+- Könnyen elkészíthető (ehhez azért jártasság is kell és sok gyakorlás, hogy az ember agya ráálljon erre a gondolkodás módra)
+- Rugalmasan módosítható, felhasználható
+- A részeredmények újrafelhasználhatók
+
+#### Mivel ez sem silver bullet, így vannak hátrányai is
+
+- Még, ha ugyanannyi lépésből is megtalálja a megoldást, akkor is több idő alatt teszi meg.
+- Nagyobb a memória használata, mivel az egyes félbehagyott, elvégzendő funkciókat is tárolnia kell.
+
+---------------------------
 A források elérhetők a [github-on](https://github.com/enpassant/miniatures/tree/master/src/main/scala/queens), illetve a Javascriptes verzió a korábban is említett [JSFiddle](https://jsfiddle.net/enpassant/k2jnmjjx/)-n.
