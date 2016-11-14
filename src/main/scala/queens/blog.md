@@ -182,7 +182,7 @@ Ha elkérjük az első eredményt, akkor pontosan azokat a lépéseket hajtja v�
   lazy val solutions = allSolution(4, 4) // semmit nem csinál
   solutions.take(1).toList
 ```
-Ha ismét elkérnénk az elsőt, akkor megint csak nem csinál semmit, hanem visszaadja azt, amit már kiszámolt.
+Ha ismét elkérjük az elsőt, akkor megint csak nem csinál semmit, hanem visszaadja azt, amit már kiszámolt.
 
 Ha másodszorra két megoldást kérünk el, akkor folytatja a keresést ott, ahol abbahagyta egészen addig, amíg meg nem találja a második megoldást.
 ``` scala
