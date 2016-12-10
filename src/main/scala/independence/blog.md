@@ -19,12 +19,15 @@ Sokan észre sem vesszük, hogy milyen sok helyen alkalmazzuk az erős függős�
 
 Például ciklus változót mindig erős függőséggel használunk (integer érték vagy osztály).
 Miért?
+
 1. Nem tervezzük, hogy lecserélnénk másra.
 2. Sima érték (pure függvényeket alkalmazunk), ezért mindig determinisztukus a viselkedése, ezért semmi gond nem jelentkezik a tesztelésénél.
 
 Ez fordítva is igaz, ha valamit nem akarunk lecserélni és sima érték, akkor erősen függhet tőle más, gondot nem fog okozni.
+
 A használata viszont sokkal kényelmesebb:
-1. nem kell interfészt hozzá csinálni,
+
+1. nem kell interfészt készíteni hozzá,
 2. nem kell feloldani a függőséget, mindig ott van és müködésre kész,
 3. nem kell különböző implementációkat készíteni hozzá (production, teszt),
 4. nem kell mock/stub-olni a tesztelésnél.
@@ -54,15 +57,22 @@ A unit tesztek és az esetleges lecserélhetőség végett itt általában gyeng
 A felhasználó fevitel egy lehetséges folyamata:
 
 * A UserView elküldi a UserControllernek a megadott adatokat.
+* A UserController validálja az adatokat, fatal probléma esetén megszakítja a folyamatot, a validációs hibák megjelenítése a UserView segítségével.
 * A UserController meghívja a UserService felhasználó felviteli funkcióját a megadott adatokkal.
-* A UserService validálja az adatokat, fatal probléma esetén megszakítja a folyamatot, a validációs hibákat visszaküldi a hívónak.
 * A UserService a UserDao segítségével elvégzi az adatok tárolását.
 * Ha sikeres volt minden és van email megadva, akkor a MailSender segítségével emailt küld.
 * Ha sikeres volt minden és van telefonszám megadva, akkor az SmsSender segítségével Sms-t küld.
 * A hibákat és a sikeres műveletekről szóló információkat visszaadja a hívónak.
-* A UserController a hibákat és a sikeres műveletekről szóló információkat visszaadja a hívónak.
+* A UserController a hibákat és a sikeres műveletekről szóló információkat megjelenítheti a UserView segítségével.
 * Minden osztályunk metódusai naplózhatnak információkat a Logger osztály segítségével.
 
-Próbáljuk meg átalakítani.
+A tényleges implementáció elkészítésétől most eltekintek, gondolom nagyon sok ilyet láttok minden nap, vagy akár az interneten is fellelhető nagyon sok hasonló.
 
+Próbáljuk meg átalakítani!
+
+## Alkalmazás átalakítása
+
+A felhasználó felvitel folyamatában több olyan osztály metódus hívása is szerepel, amiknek a végrehajtását elodázhatjuk. Például a naplózó műveletek végrehajtása ugyanolyan jó a folyamat végén, mint közben. Hasonlóan elodázható az email, SMS küldés, a validációs hibák megjelenítése, még akár az adatbázis műveletek végrehajtása is.
+
+A megoldás roppant egyszerű, az adott művelet végrehajtása helyett, létrehozzuk az adott művelet végrehajtásához szükséges adatot és ezeket gyűjtjük a folyamat végéig. A folyamat végén, attól függően, hogy mi lett a végeredmény, szépen végrehajtathatjuk az összegyűjtött műveleteket, azok egy részét vagy akár semmit sem.
 
