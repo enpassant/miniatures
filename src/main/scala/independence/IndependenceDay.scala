@@ -110,20 +110,16 @@ object IndependenceDay extends App {
   }
 
   def processResult(result: Result[_]) = {
-    val transactionResult = result.processInfos(runTransaction)
-
+    val validationResult = result.processAllInfos(processValidation)
+    val transactionResult = validationResult.processInfos(runTransaction)
     val emailResult = transactionResult.processInfos(sendEmail)
-
     val smsResult = emailResult.processInfos(sendSms)
-
-    val validationResult = smsResult.processAllInfos(processValidation)
-
     val finalResult =
-      if (validationResult.isGood) {
-        validationResult.processInfos(processLog(WARN))
+      if (smsResult.isGood) {
+        smsResult.processInfos(processLog(WARN))
       } else {
-        Console.err.println(validationResult)
-        validationResult.processAllInfos(processLog(TRACE))
+        Console.err.println(smsResult)
+        smsResult.processAllInfos(processLog(TRACE))
       }
     println()
 
