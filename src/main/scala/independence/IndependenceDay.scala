@@ -18,12 +18,12 @@ object IndependenceDay extends App {
   }
   val enabledLogger = TestLogger(true)
 
-  val validatorRequired = Validator((n: String) => !n.isEmpty, "required")
+  def validatorRequired = Validator((n: String) => !n.isEmpty, "required")
   def regexValidator(regex: String, cause: String) =
     Validator((n: String) => n.matches(regex), cause)
-  val validatorName = regexValidator("\\w+\\s+\\w+", "wrong name format")
-  val validatorPhone = regexValidator("""\(\d+\)\d+-\d+""", "wrong phone format")
-  val validatorEmail = regexValidator("\\w+@\\w+\\.\\w+", "wrong email format")
+  def validatorName = regexValidator("\\w+\\s+\\w+", "wrong name format")
+  def validatorPhone = regexValidator("""\(\d+\)\d+-\d+""", "wrong phone format")
+  def validatorEmail = regexValidator("\\w+@\\w+\\.\\w+", "wrong email format")
 
   def validateUser(name: String, phone: String, email: String) = {
     for {
@@ -81,7 +81,7 @@ object IndependenceDay extends App {
   def isUserIdOdd(id: Long) = if (id % 2 == 1) {
     Right(id)
   } else {
-    Left(TextError("User id most be odd"))
+    Left(TextError("User id must be odd"))
   }
 
   def persistUser(id: Long, user: User) = user.name match {
