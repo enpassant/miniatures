@@ -172,8 +172,8 @@ object IndependenceDay extends App {
 
   def processLog(minLevel: Level)(logs: Vector[Log]) = {
     logs foreach {
-      case Log(level, place, message) if level >= minLevel =>
-        println(s"/LOG/ [$level] |$place|.${message()}")
+      case log @ Log(level, place) if level >= minLevel =>
+        println(s"/LOG/ [$level] |$place|.${log.message()}")
       case _ =>
     }
     Result(())

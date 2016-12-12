@@ -6,10 +6,36 @@ object Level extends Enumeration {
 }
 import Level._
 
-case class Log(level: Level, place: String, message: () => String)
+class Log(val level: Level, val place: String, val message: () => String)
   extends Information
 {
-  override def toString = s"Log($level, $place, ${message()})"
+  override def toString = s"Log($level, $place)"
+
+  def show = s"Log($level, $place, ${message()})"
+
+  def canEqual(a: Any) = a.isInstanceOf[Log]
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Log =>
+        that.canEqual(this) && this.hashCode == that.hashCode
+      case _ => false
+  }
+
+  override def hashCode:Int = {
+    level.hashCode + place.hashCode
+  }
+}
+
+object Log {
+  def apply(level: Level, place: String, message: => String) = {
+    lazy val msg = message
+    new Log(level, place, () => msg)
+  }
+
+  def unapply(log: Log): Option[(Level, String)] = {
+    Some((log.level, log.place))
+  }
 }
 
 trait DBStatement extends Information
@@ -31,13 +57,8 @@ case class Validator[T](predicate: T => Boolean, cause: String)
 object ResultOps {
   import Result._
 
-  def log(level: Level, place: String, message: => String): Log = {
-    lazy val msg = message
-    Log(level, place, () => msg)
-  }
-
   def log[T](level: Level, place: String, result: Result[T]) = {
-    val message = () => result match {
+    lazy val message = result match {
       case GoodResult(v, i) => v.toString
       case BadResult(c, i) => c.toString
     }
