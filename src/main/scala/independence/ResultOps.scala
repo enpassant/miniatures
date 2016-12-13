@@ -11,8 +11,6 @@ class Log(val level: Level, val place: String, val message: () => String)
 {
   override def toString = s"Log($level, $place)"
 
-  def show = s"Log($level, $place, ${message()})"
-
   def canEqual(a: Any) = a.isInstanceOf[Log]
 
   override def equals(that: Any): Boolean =

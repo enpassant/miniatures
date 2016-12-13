@@ -67,9 +67,9 @@ class IndependenceDaySpec extends FunSpec with Matchers {
 
     it("should give BadResult if name is good, others empty") {
       val result = insertUser(Option("7"), "Teszt Elek", "", "")
-      result should matchPattern {
-        case GoodResult(_, _) =>
-      }
+
+      result.isGood shouldBe true
+
       result.infos should contain allOf (
         Validation('Error, "userPhone", "required"),
         Validation('Error, "userEmail", "required"),
@@ -78,9 +78,9 @@ class IndependenceDaySpec extends FunSpec with Matchers {
 
     it("should give BadResult if name and phone good, mail wrong") {
       val result = insertUser(Option("7"), "Teszt Elek", "(20)234-5678", "mail")
-      result should matchPattern {
-        case GoodResult(_, _) =>
-      }
+
+      result.isGood shouldBe true
+
       result.infos should contain allOf (
         Validation('Warning, "userEmail", "wrong email format"),
         DBPersist(DBUser(21, "Teszt Elek")),
@@ -94,9 +94,9 @@ class IndependenceDaySpec extends FunSpec with Matchers {
         "Teszt Elek",
         "(20)234-5678",
         "teszt@elek.hu")
-      result should matchPattern {
-        case GoodResult(_, _) =>
-      }
+
+      result.isGood shouldBe true
+
       result.infos should contain allOf (
         Log(INFO, "id * 3", ""),
         Log(INFO, "persistUser", ""),
