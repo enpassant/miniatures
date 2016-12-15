@@ -46,6 +46,7 @@ class IndependenceDaySpec extends FunSpec with Matchers {
         case BadResult(TextError("Predicate does not hold for -7"), _) =>
       }
       result.infos should contain allOf (
+        Log(DEBUG, "validateUser", ""),
         Validation('Error, "userName", "wrong name format"),
         Validation('Error, "userPhone", "wrong phone format"),
         Validation('Warning, "userEmail", "wrong email format"))

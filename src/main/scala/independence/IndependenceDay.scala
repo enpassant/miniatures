@@ -13,11 +13,6 @@ object IndependenceDay extends App {
   case class DBUser(id: Long, name: String)
   case class DBContact(id: Long, mode: String, value: String)
 
-  case class TestLogger(isEnabled: Boolean) extends Logger {
-    def isLevelEnabled(level: Level): Boolean = isEnabled
-  }
-  val enabledLogger = TestLogger(true)
-
   def validatorRequired = Validator((n: String) => !n.isEmpty, "required")
   def regexValidator(regex: String, cause: String) =
     Validator((n: String) => n.matches(regex), cause)
@@ -28,17 +23,17 @@ object IndependenceDay extends App {
   def validateUser(name: String, phone: String, email: String) = {
     for {
       userName <- validateField(name, "userName",
-          ('Fatal, validatorRequired),
-          ('Error, validatorName)
-        )
+        ('Fatal, validatorRequired),
+        ('Error, validatorName)
+      )
       userPhone <- validateField(phone, "userPhone",
-          ('Error, validatorRequired),
-          ('Error, validatorPhone)
-        )
+        ('Error, validatorRequired),
+        ('Error, validatorPhone)
+      )
       userEmail <- validateField(email, "userEmail",
-          ('Error, validatorRequired),
-          ('Warning, validatorEmail)
-        )
+        ('Error, validatorRequired),
+        ('Warning, validatorEmail)
+      )
     } yield User(userName, userPhone, userEmail)
   }
 
