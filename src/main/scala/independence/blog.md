@@ -21,14 +21,14 @@ Például ciklus változót mindig erős függőséggel használunk (integer ér
 Miért?
 
 1. Nem tervezzük, hogy lecserélnénk másra.
-2. Sima érték (pure függvényeket alkalmazunk), ezért mindig determinisztukus a viselkedése, ezért semmi gond nem jelentkezik a tesztelésénél.
+2. Sima érték (pure függvényeket alkalmazunk), ezért mindig determinisztikus a viselkedése, ezért semmi gond nem jelentkezik a tesztelésénél.
 
 Ez fordítva is igaz, ha valamit nem akarunk lecserélni és sima érték, akkor erősen függhet tőle más, gondot nem fog okozni.
 
 A használata viszont sokkal kényelmesebb:
 
 1. nem kell interfészt készíteni hozzá,
-2. nem kell feloldani a függőséget, mindig ott van és müködésre kész,
+2. nem kell feloldani a függőséget, mindig ott van és működésre kész,
 3. nem kell különböző implementációkat készíteni hozzá (production, teszt),
 4. nem kell mock/stub-olni a tesztelésnél,
 5. a unit teszt az egyben integrációs teszt is, hiszen nem kell a függőségeinket feloldani, mert azok determinisztikusak.
@@ -55,7 +55,7 @@ Nézzük ennek a felépítését:
 
 A unit tesztek és az esetleges lecserélhetőség végett itt általában gyenge függőséget alkalmazunk és Dependency Injection-nel oldjuk fel. A unit tesztek miatt az egyes osztályokat mock/stubolnunk kell mindenhol.
 
-A felhasználó fevitel egy lehetséges folyamata:
+A felhasználó felvitel egy lehetséges folyamata:
 
 * A UserView elküldi a UserControllernek a megadott adatokat.
 * A UserController validálja az adatokat, fatal probléma esetén megszakítja a folyamatot, a validációs hibák megjelenítése a UserView segítségével.
