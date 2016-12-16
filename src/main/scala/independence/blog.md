@@ -142,5 +142,5 @@ Ez Scalaban kb. így nézne ki:
   val result = for {
     validatedUserName <- validateName(userName)
     validatedUserEmail <- validateEmail(userEmail)
-  }
+  } yield (validatedUserName, validatedUserEmail)
 ```
