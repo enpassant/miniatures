@@ -9,18 +9,18 @@ object NBodyArrayPerf extends Bench.LocalTime {
     size <- sizes
   } yield 0 until size
 
-	NBodyArray.initArrays
+  NBodyArray.initArrays
 
   performance of "NBodyArray" in {
     measure method "for" in {
       using(ranges) in {
-				r => r.foreach(i => NBodyArray.forSim(100))
+        r => r.foreach(i => NBodyArray.forSim(100))
       }
     }
 
     measure method "while" in {
       using(ranges) in {
-				r => r.foreach(i => NBodyArray.whileSim(100))
+        r => r.foreach(i => NBodyArray.whileSim(100))
       }
     }
 
