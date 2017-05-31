@@ -92,17 +92,15 @@ object ShapePF {
     case (device, shape, amount) => s"Unknown device $device or shape $shape"
   }
 
-  val minAmount: Int => ExportShape = (minimum) => {
-    case (_, _, amount: Int) if amount < minimum =>
-      s"Minimum amount is $minimum, you have only $amount"
+  val minAmount: Int => (Device, Shape, Int) => Boolean = (minimum) => {
+    case (_, _, amount: Int) => amount >= minimum
   }
 
-  val compose: (ExportShape, ExportShape) => ExportShape = (export, filter) => {
-    case (device, shape, amount) if export.isDefinedAt(device, shape, amount) &&
-      filter.isDefinedAt(device, shape, amount) =>
-        filter(device, shape, amount)
-    case (device, shape, amount) if export.isDefinedAt(device, shape, amount) =>
-      export(device, shape, amount)
+  val compose: (ExportShape, (Device, Shape, Int) => Boolean) => ExportShape =
+    (export, filter) =>
+  {
+    case (device, shape, amount) if export.isDefinedAt(device, shape, amount)
+      && filter(device, shape, amount) => export(device, shape, amount)
   }
 
   val draw = drawExpensiveCircle orElse drawCircle orElse drawEllipse orElse
@@ -126,11 +124,14 @@ object ShapePF {
   val printWithReform2 = applyReform(print2, reform) orElse exportUnknown
   val printWithReform3 = applyReform(print3, reform) orElse exportUnknown
 
-  val export = minAmount(10) orElse draw orElse printEpsonCircle orElse print
+  val export = compose(
+    draw orElse printEpsonCircle orElse print,
+    minAmount(10)
+  ) orElse exportUnknown
 
   val exportAmount = compose(draw, minAmount(100)) orElse
-    compose(printEpsonCircle, minAmount(50)) orElse
-    compose(print, minAmount(75))
+    compose(printEpsonCircle, minAmount(75)) orElse
+    compose(print, minAmount(50))
 
   val exportHighAmount = compose(draw, minAmount(1000)) orElse
     compose(printEpsonCircle, minAmount(500)) orElse
