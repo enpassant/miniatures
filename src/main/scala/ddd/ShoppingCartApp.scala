@@ -26,12 +26,19 @@ object ShoppingCartApp extends App {
     implicit val executionContext = system.dispatcher
 
     var appState = setState(EmptyCart)
+    var events: List[Event] = List()
 
     val route =
       path("") {
         respondCapabilities(appState.uris) {
           headComplete
         }
+      } ~
+      path("replay") {
+        val replayedState = events.foldLeft[State](EmptyCart) {
+          (state, event) => eventHandler(state, event).right.get
+        }
+        complete(s"ReplayedState: $replayedState")
       } ~
       path(Segment) { uri =>
         post {
@@ -43,9 +50,10 @@ object ShoppingCartApp extends App {
               val stateResultEither = capability(appState.state, command)
               stateResultEither.right foreach { stateResult =>
                 appState = setState(stateResult.state)
+                events = events ++ stateResult.events
               }
               respondCapabilities(appState.uris) {
-                complete(stateResultEither.toString)
+                complete(s"Events: $events\nResult: $stateResultEither")
               }
             } else reject
           }
