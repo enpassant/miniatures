@@ -16,6 +16,7 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Accept, Link, LinkParams, LinkValue}
+import akka.http.scaladsl.model.StatusCodes._
 import akka.stream.ActorMaterializer
 import java.util.UUID
 import scala.io.StdIn
@@ -48,12 +49,17 @@ object ShoppingCartApp extends App {
               val rel = appState.uris(uri)
               val capability = appState.capabilities(rel) orElse wrongCapability
               val stateResultEither = capability(appState.state, command)
-              stateResultEither.right foreach { stateResult =>
-                appState = setState(stateResult.state)
-                events = events ++ stateResult.events
-              }
-              respondCapabilities(appState.uris) {
-                complete(s"Events: $events\nResult: $stateResultEither")
+              stateResultEither match {
+                case Right(stateResult) =>
+                  appState = setState(stateResult.state)
+                  events = events ++ stateResult.events
+                  respondCapabilities(appState.uris) {
+                    complete(s"Events: $events\nResult: $stateResult")
+                  }
+                case Left(error) =>
+                  respondCapabilities(appState.uris) {
+                    complete((BadRequest, ErrorMessages.toMessage(error)))
+                  }
               }
             } else reject
           }

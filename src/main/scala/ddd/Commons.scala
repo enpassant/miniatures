@@ -24,8 +24,10 @@ object Types {
     (State, Command) -> CommandResult[Event]
   type EventHandler[S <: State, E <: Event, St <: State] =
     (State, Event) -> Either[Error, State]
-  type Capability = (State, Command) -> Either[Error, StateResult]
-  type GetCapabilities = State -> Map[String, Capability]
+  type Capability =
+    (State, Command) -> Either[Error, StateResult]
+  type GetCapabilities =
+    State -> Map[String, Capability]
 
   def createCapability(
     commandHandler: CommandHandler[State, Command, Event],
