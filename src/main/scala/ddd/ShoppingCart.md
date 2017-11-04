@@ -158,8 +158,8 @@ A fenitek miatt nem szükséges a különös esetekhez szükséges dokumentáci�
 
 Sajnos nem minden statikusan típusos nyelv ad ekkora segítséget a fentiekhez (pl. Java), mint a Scala, de azért van több is, használjuk azokat :-), sőt van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#) !
 
-A fenti cikk létrejöveteléhez nagyban hozzájárult a [fsharpforfunandprofit](http://fsharpforfunandprofit.com/) oldal. Ez egy igazi aranybánya! Akik nem szeretiki és/vagy nem használják az F#-ot, azoknak is érdemes végigböngészni, rengeteg jó videó és cikk található rajta.
+A fenti cikk létrejöveteléhez nagyban hozzájárult a [fsharpforfunandprofit](http://fsharpforfunandprofit.com/) oldal. Ez egy igazi aranybánya! Akik nem szeretik és/vagy nem használják az F#-ot, azoknak is érdemes végigböngészni, rengeteg jó videó és cikk található rajta.
 
 A hibakezelés, capability (képesség) alapú tervezés/programozás, FP egyszerűen és érthetően, és még további sok jó anyag található rajta; amik alapján akár további blogok is készülhetnek, természetesen Scala-ra adoptálva.
 
-Happy typing ;-)!
+Happy typing! ;-)
