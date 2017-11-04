@@ -165,7 +165,7 @@ Az első példánál kifejezhető volt az az állapot, hogy a kosárhoz szám, s
 2. Másik megoldás, hogy vizsgáljuk, hogy érvénytelen állapotról van-e szó, ha igen, akkor hibát adunk. Ezzel az a probléma, hogy az ügyfél ilyen esetben olyan hibákat kaphat, amikkel nem nagyon tud mit kezdeni, pl. item.id-s elírás esetén: "Az 5 nem cikk, ezért nem lehet a kosárhoz adni!" vagy item.name-es elírás esetén: "Az iPhone nem cikk, ezért nem lehet a kosárhoz adni!".
 3. A harmadik megoldás az, hogy az érvénytelen állapotot nem engedjük kifejezhetővé tenni. A most látott esetre ilyenkor megoldás a második példa, ahol az addItem csak Item típust fogad el. A korábban látott item.id-s és item.name-es elírásokra egyszerűen fordítási hibákat fogunk kapni, mert azok az állapotok nem kifejezhetők.
 
-A második példa sem szűkítette le az állapotokat, a különös esetek érvénytelen állapotok, amik kifejezhetők voltak. Így előfordulhat, hogy egy már kifizetésre került kosárhoz újabb cikket adjanak. Pl. kifejezhető így:
+A második példa sem szűkítette le az állapotteret eléggé, a különös esetek érvénytelen állapotok, amik kifejezhetők voltak. Így előfordulhat, hogy egy már kifizetésre került kosárhoz újabb cikket adjanak. Pl. kifejezhető így:
 ```scala
 shoppingCart.addItem(pen);
 shoppingCart.pay(mastercard);
