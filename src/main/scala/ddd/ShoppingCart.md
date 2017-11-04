@@ -152,9 +152,33 @@ Nézzük meg mely problémákat oldotta meg a típusok ilyetén használata!
 
 Nem szükséges külön dokumentáció, minden állapot, parancs, esemény, a parancsok hatása és az állapot változások részletesen benne vannak.
 
-Mivel minden egyes állapotra definiálva van, hogy mely parancsot lehet rajta végrehajtani, milyen állapotokat adhat vissza, az egyes állapotokból mely események mely állapotokba visznek át, ezért nem fordulhatnak elő a _különös esetek_! *Érvénytelen állapotot nem lehet kifejezni!*
+Mivel minden egyes állapotra definiálva van, hogy mely parancsot lehet rajta végrehajtani, milyen állapotokat adhat vissza, az egyes állapotokból mely események mely állapotokba visznek át, ezért nem fordulhatnak elő a _különös esetek_!
 
 A fenitek miatt nem szükséges a különös esetekhez szükséges dokumentáció, automatikus teszt, nem kell ezekre az implementációnál figyelni, és megszűntek az azokból eredő hiba lehetőségek és biztonsági kockázatok!
+
+Érvénytelen állapotot nem lehet kifejezni! /_Magyarázat_/
+----
+
+Az első példánál kifejezhető volt az az állapot, hogy a kosárhoz szám, szöveg vagy bármely nem Item típusú elemet adjunk, pl. így: shoppingCart.addItem(item.id) vagy shoppingCart.addItem(item.name). Ezek érvénytelen állapotok! Ha véletlenül (elírás vagy más okból) kifejezésre jut, akkor a program működésében hibát okozhat.
+
+1. Egyik megoldás, hogy reménykedünk, hogy nem lesz ilyen. Ha mégis lesz, akkor reméljük, hogy hamar kiderül és minél kevesebb kárt okoz.
+2. Másik megoldás, hogy vizsgáljuk, hogy érvénytelen állapotról van-e szó, ha igen, akkor hibát adunk. Ezzel az a probléma, hogy az ügyfél ilyen esetben olyan hibákat kaphat, amikkel nem nagyon tud mit kezdeni, pl. item.id-s elírás esetén: "Az 5 nem cikk, ezért nem lehet a kosárhoz adni!" vagy item.name-es elírás esetén: "Az iPhone nem cikk, ezért nem lehet a kosárhoz adni!".
+3. A harmadik megoldás az, hogy az érvénytelen állapotot nem engedjük kifejezhetővé tenni. A most látott esetre ilyenkor megoldás a második példa, ahol az addItem csak Item típust fogad el. A korábban látott item.id-s és item.name-es elírásokra egyszerűen fordítási hibákat fogunk kapni, mert azok az állapotok nem kifejezhetők.
+
+A második példa sem szűkítette le az állapotokat, a különös esetek érvénytelen állapotok, amik kifejezhetők voltak. Így előfordulhat, hogy egy már kifizetésre került kosárhoz újabb cikket adjanak. Pl. kifejezhető így:
+```scala
+shoppingCart.addItem(pen);
+shoppingCart.pay(mastercard);
+shoppingCart.addItem(iPhone);
+```
+
+Így egy 500Ft-os kifizetett kosárhoz hozzáadható az 500eFt-os iPhone (előző 1. pont). Ahhoz, hogy ezt elkerüljük az egyes metódusokat kiegészíthetjük vizsgálatokkal és hibaüzenetekkel (előző 2. pont).
+Avagy ezeket az érvénytelen állapotokat is kifejezhetetlenné tesszük (előző 3. pont), így jutunk el a 3. példához.
+Az utolsó példa esetén nem lehetséges, hogy pl. egy már kifizetésre került kosárhoz új cikket adjanak, vagy töröljenek belőle vagy újra kifizessék (lásd különös esetek). Egyszerűen nem tud olyan kódot írni a kliens programozó, aki a ShoppingCartAPI-t használja, hogy az hibásan leforduljon.
+
+
+Végszó
+----
 
 Sajnos nem minden statikusan típusos nyelv ad ekkora segítséget a fentiekhez (pl. Java), mint a Scala, de azért van több is, használjuk azokat :-), sőt van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#) !
 
