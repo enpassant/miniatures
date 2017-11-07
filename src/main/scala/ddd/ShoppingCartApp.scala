@@ -6,7 +6,6 @@ import ShoppingCartAPI._
 import ShoppingCart._
 import ShoppingCartConfig._
 import PaymentAPI._
-import SampleData._
 import Directives._
 
 import akka.actor.ActorSystem
@@ -45,7 +44,7 @@ object ShoppingCartApp extends App {
         post {
           entity(as[String]) { data =>
             if (appState.uris contains uri) {
-              val command = convertToCommand(data)
+              val command = SampleData.convertToCommand(data)
               val rel = appState.uris(uri)
               val capability = appState.capabilities(rel) orElse wrongCapability
               val stateResultEither = capability(appState.state, command)

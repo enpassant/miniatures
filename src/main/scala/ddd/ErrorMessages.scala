@@ -5,7 +5,7 @@ import PaymentAPI._
 import ErrorAPI._
 
 object ErrorMessages {
-  def toMessage(error: Error) = error match {
+  def toMessage(error: Failure) = error match {
     case ItemAlreadyAdded(item) =>
       s"${item} is already added!"
     case NoItemInCart(item) =>

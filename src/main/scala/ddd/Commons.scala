@@ -1,6 +1,5 @@
 package ddd
 
-trait Error
 trait State
 trait Command
 trait Event
@@ -19,13 +18,13 @@ object Types {
 
   case class StateResult(state: State, events: List[Event])
   type ->[A, B] = PartialFunction[A, B]
-  type CommandResult[Event] = Either[Error, List[Event]]
+  type CommandResult[Event] = Either[Failure, List[Event]]
   type CommandHandler[S <: State, C <: Command, E <: Event] =
     (State, Command) -> CommandResult[Event]
   type EventHandler[S <: State, E <: Event, St <: State] =
-    (State, Event) -> Either[Error, State]
+    (State, Event) -> Either[Failure, State]
   type Capability =
-    (State, Command) -> Either[Error, StateResult]
+    (State, Command) -> Either[Failure, StateResult]
   type GetCapabilities =
     State -> Map[String, Capability]
 

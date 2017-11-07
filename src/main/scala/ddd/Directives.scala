@@ -2,7 +2,6 @@ package ddd
 
 import Types._
 import ShoppingCartConfig._
-import SampleData._
 
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.server.Directives._
