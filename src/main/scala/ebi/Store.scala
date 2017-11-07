@@ -4,15 +4,21 @@ case class Item(name: String, price: Double)
 case class OrderedItem(itemId: String, quantity: Double)
 case class Order(id: String, customer: String, items: List[OrderedItem])
 
-case class OrderRequest(order: Order)
-case class OrderResponse(status: Either[String, Double])
+object StoreAPI {
+  case class OrderRequest(order: Order)
+  case class OrderResponse(status: Either[String, Double])
 
-object Database {
+  type PlaceOrder = OrderRequest => OrderResponse
+}
+
+object DatabaseAPI {
   type GetItem = String => Either[String, Item]
   type SaveOrder = Order => Either[String, Order]
 }
 
 object MemDatabase {
+  import DatabaseAPI._
+
   val items = Map(
     "001" -> Item("Sword", 399.9),
     "002" -> Item("Chair", 24.9),
@@ -20,17 +26,17 @@ object MemDatabase {
     "004" -> Item("Bed", 59.9)
   )
 
-  val getItem: Database.GetItem = id => items get id match {
+  val getItem: GetItem = id => items get id match {
     case None => Left(s"Missing item $id!")
     case Some(item) => Right(item)
   }
-  val saveOrder: Database.SaveOrder = order => Right(order)
-  val saveOrderFailing: Database.SaveOrder = order => Left("No space on disk!")
+  val saveOrder: SaveOrder = order => Right(order)
+  val saveOrderFailing: SaveOrder = order => Left("No space on disk!")
 }
 
 object Store {
-  import Database._
-  type PlaceOrder = OrderRequest => OrderResponse
+  import DatabaseAPI._
+  import StoreAPI._
 
   private def sequence[A, B](s: Seq[Either[A, B]]): Either[A, Seq[B]] =
     s.foldRight(Right(Nil): Either[A, List[B]]) {
@@ -52,6 +58,7 @@ object Store {
 object StoreApp extends App {
   import MemDatabase._
   import Store._
+  import StoreAPI._
 
   val placeOrder: PlaceOrder = placeOrderBusinessLogic(getItem, saveOrder)
   val placeOrderFailing: PlaceOrder = placeOrderBusinessLogic(getItem, saveOrderFailing)

@@ -5,7 +5,7 @@ import core._
 import controller._
 import service._
 import protocols.http._
-import colossus.protocols.http.server._
+import colossus.protocols.http._
 import colossus.protocols.websocket._
 import UrlParsing._
 import HttpMethod._
@@ -20,8 +20,9 @@ import org.json4s.JsonDSL._
 
 class HelloHandler(context: ServerContext) extends RequestHandler(context) {
   implicit object JsonBody extends HttpBodyEncoder[JValue] {
+    val contentType = Some(ContentType.ApplicationJson)
     def encode(json: JValue)  = {
-      HttpBody(compact(render(json))).withContentType("application/json")
+      HttpBody(compact(render(json)))
     }
   }
 
@@ -69,8 +70,9 @@ object Main extends App {
   }
 
   implicit object JsonBody extends HttpBodyEncoder[JValue] {
+    val contentType = Some(ContentType.ApplicationJson)
     def encode(json: JValue)  = {
-      HttpBody(compact(render(json))).withContentType("application/json")
+      HttpBody(compact(render(json)))
     }
   }
 

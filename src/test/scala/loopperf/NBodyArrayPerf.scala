@@ -1,5 +1,6 @@
 package loopperf
 
+/*
 import org.scalameter.api._
 
 object NBodyArrayPerf extends Bench.LocalTime {
@@ -26,6 +27,7 @@ object NBodyArrayPerf extends Bench.LocalTime {
 
   }
 }
+*/
 
 /**
  * Results
