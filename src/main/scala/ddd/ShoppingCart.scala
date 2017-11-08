@@ -70,18 +70,25 @@ object ShoppingCart {
 
   val getEmptyCartCaps: GetCapabilities = {
     case state @ EmptyCart =>
-      Map("AddItem" -> createCapability(addToEmpty, handleFirstItemAdded))
+      Map("AddItem" ->
+        createCapability(state, addToEmpty, handleFirstItemAdded))
   }
 
   val getActiveCartCaps: GetCapabilities = {
     case state @ ActiveCart(unpaidItems) =>
       Map(
-        "AddItem" -> createCapability(addToActive, handleNextItemAdded),
-        "RemoveItem" -> createCapability(
+        "AddItem" ->
+          createCapability(state, addToActive, handleNextItemAdded),
+        "Pay" -> createCapability(state, payActive, handlePaid)
+      ) ++
+      unpaidItems.map { item =>
+        "RemoveItem_" + item.id -> createCapability(
+          state,
+          RemoveItem(item),
           removeFromActive,
           handleAnItemRemoved orElse handleLastItemRemoved
-        ),
-        "PayActive" -> createCapability(payActive, handlePaid))
+        )
+      }.toMap
   }
 
   val getPaidCartCaps: GetCapabilities = {

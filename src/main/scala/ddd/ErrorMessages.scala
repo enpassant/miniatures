@@ -17,6 +17,8 @@ object ErrorMessages {
       s"Unknown $command command for $state state!"
     case UnknownEvent(state, event) =>
       s"Unknown $event event for $state state!"
+    case UnknownCapability(state, command) =>
+      s"Unknown capability /$command command for $state state/!"
 
     case _ => error.toString
   }

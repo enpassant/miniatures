@@ -11,4 +11,5 @@ object ErrorAPI {
 
   case class UnknownCommand(state: State, command: Command) extends Error
   case class UnknownEvent(state: State, event: Event) extends Error
+  case class UnknownCapability(state: State, command: Command) extends Error
 }

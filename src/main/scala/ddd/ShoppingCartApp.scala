@@ -46,8 +46,9 @@ object ShoppingCartApp extends App {
             if (appState.uris contains uri) {
               val command = SampleData.convertToCommand(data)
               val rel = appState.uris(uri)
-              val capability = appState.capabilities(rel) orElse wrongCapability
-              val stateResultEither = capability(appState.state, command)
+              val capability = appState.capabilities(rel) orElse
+                wrongCapability(appState.state)
+              val stateResultEither = capability(command)
               stateResultEither match {
                 case Right(stateResult) =>
                   appState = setState(stateResult.state)

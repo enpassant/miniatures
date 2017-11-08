@@ -36,5 +36,10 @@ object ShoppingCartConfig {
     getActiveCartCaps orElse
     getPaidCartCaps
 
-  val wrongCapability = createCapability(wrongCommand, wrongEvent)
+  val wrongCapability: State => Capability = {
+    state => {
+      case command =>
+        Left(UnknownCapability(state, command))
+    }
+  }
 }

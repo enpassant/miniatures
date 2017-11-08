@@ -38,9 +38,9 @@ class SampleData {
   val convertToCommand = (data: String) => data match {
     case "AddItemMilk" => AddItem(itemMilk)
     case "AddItemTV" => AddItem(itemTV)
-    case "RemoveItemMilk" => RemoveItem(itemMilk)
-    case "RemoveItemTV" => RemoveItem(itemTV)
     case "PayCard" => Pay(mastercard)
+    case "PayCash" => Pay(Cash)
+    case "" => NoCommand
     case _ => WrongCommand(data)
   }
 }

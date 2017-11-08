@@ -24,7 +24,7 @@ class ShoppingCartSpec extends FunSpec with Matchers {
           val capabilitiesEmptyCart = getCapabilities(emptyCart)
           capabilitiesEmptyCart should contain key "AddItem"
           val addItemToEmpty = capabilitiesEmptyCart("AddItem")
-          val oneItemCartEither = addItemToEmpty(emptyCart, AddItem(itemMilk))
+          val oneItemCartEither = addItemToEmpty(AddItem(itemMilk))
           oneItemCartEither shouldBe Right(
             StateResult(
               ActiveCart(List(itemMilk)),
@@ -34,16 +34,15 @@ class ShoppingCartSpec extends FunSpec with Matchers {
           val capabilitiesOneItemCart = getCapabilities(oneItemCart)
           capabilitiesOneItemCart should (
             contain key ("AddItem") and
-            contain key ("RemoveItem") and
-            contain key ("PayActive"))
-          val removeFromActive = capabilitiesOneItemCart("RemoveItem")
-          val emptyCartAgainEither =
-            removeFromActive(oneItemCart, RemoveItem(itemMilk))
+            contain key ("RemoveItem_1") and
+            contain key ("Pay"))
+          val removeFromActive = capabilitiesOneItemCart("RemoveItem_1")
+          val emptyCartAgainEither = removeFromActive(NoCommand)
           emptyCartAgainEither shouldBe Right(
             StateResult(EmptyCart, List(LastItemRemoved(itemMilk))))
 
           val addNextItem = capabilitiesOneItemCart("AddItem")
-          val twoItemCartEither = addNextItem(oneItemCart, AddItem(itemTV))
+          val twoItemCartEither = addNextItem(AddItem(itemTV))
           twoItemCartEither shouldBe Right(
             StateResult(
               ActiveCart(List(itemMilk, itemTV)),
@@ -53,18 +52,18 @@ class ShoppingCartSpec extends FunSpec with Matchers {
           val capabilitiesTwoItemCart = getCapabilities(twoItemCart)
           capabilitiesTwoItemCart should (
             contain key ("AddItem") and
-            contain key ("RemoveItem") and
-            contain key ("PayActive"))
+            contain key ("RemoveItem_1") and
+            contain key ("RemoveItem_2") and
+            contain key ("Pay"))
 
-          val removeAnItemFromActive = capabilitiesTwoItemCart("RemoveItem")
-          val oneTvItemCartEither =
-            removeAnItemFromActive(twoItemCart, RemoveItem(itemMilk))
+          val removeAnItemFromActive = capabilitiesTwoItemCart("RemoveItem_1")
+          val oneTvItemCartEither = removeAnItemFromActive(NoCommand)
           oneTvItemCartEither shouldBe Right(
             StateResult(ActiveCart(List(itemTV)),
             List(AnItemRemoved(itemMilk))))
 
-          val payActive = capabilitiesTwoItemCart("PayActive")
-          val paidCartEither = payActive(twoItemCart, Pay(mastercard))
+          val payActive = capabilitiesTwoItemCart("Pay")
+          val paidCartEither = payActive(Pay(mastercard))
           paidCartEither should (
             be (Right(
               StateResult(

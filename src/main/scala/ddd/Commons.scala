@@ -4,6 +4,8 @@ trait State
 trait Command
 trait Event
 
+case object NoCommand extends Command
+
 object Types {
   sealed trait Quantity {
     def volume: BigDecimal
@@ -24,15 +26,16 @@ object Types {
   type EventHandler[S <: State, E <: Event, St <: State] =
     (State, Event) -> Either[Failure, State]
   type Capability =
-    (State, Command) -> Either[Failure, StateResult]
+    Command -> Either[Failure, StateResult]
   type GetCapabilities =
     State -> Map[String, Capability]
 
   def createCapability(
+    state: State,
     commandHandler: CommandHandler[State, Command, Event],
     eventHandler: EventHandler[State, Event, State]): Capability =
   {
-    case (state, command) if commandHandler.isDefinedAt(state, command) =>
+    case command if commandHandler.isDefinedAt(state, command) =>
       val fn = commandHandler andThen
         (r => r.right.flatMap {
           ls => eventHandler(state, ls.head).right.map {
@@ -40,5 +43,14 @@ object Types {
           }
         })
       fn(state, command)
+  }
+
+  def createCapability(
+    state: State,
+    command: Command,
+    commandHandler: CommandHandler[State, Command, Event],
+    eventHandler: EventHandler[State, Event, State]): Capability =
+  {
+    case cmd => createCapability(state, commandHandler, eventHandler)(command)
   }
 }
