@@ -17,21 +17,18 @@ object ConfigAPI {
     else None
   }
 
-  def readPerson(name: String, age: Int): Option[Person] = {
+  def readPerson(config: Config): Option[Person] = {
     for {
-      n <- readName(name)
-      a <- readAge(age)
-    } yield Person(n, a)
+      name <- readName(config.name)
+      age <- readAge(config.age)
+    } yield Person(name, age)
   }
 }
 
 object ConfigApp extends App {
   import ConfigAPI._
 
-  val config1 = Config("John Doe", 20)
-  println(readPerson(config1.name, config1.age))
-  val config2 = Config("Incognito", 99)
-  println(readPerson(config2.name, config2.age))
-  val config3 = Config("John Doe", 170)
-  println(readPerson(config3.name, config3.age))
+  println(readPerson(Config("John Doe", 20)))
+  println(readPerson(Config("Incognito", 99)))
+  println(readPerson(Config("John Doe", 170)))
 }
