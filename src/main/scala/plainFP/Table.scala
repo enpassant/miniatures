@@ -1,14 +1,8 @@
 package plainFP
 
 object TableAPI {
-  case class Table(rows: Vector[Row]) {
-    def add(row: Row) = Table(rows :+ row)
-  }
-
-  case class Row(cells: Vector[Cell]) {
-    def add(cell: Cell) = Row(cells :+ cell)
-  }
-
+  case class Table(rows: Vector[Row])
+  case class Row(cells: Vector[Cell])
   case class Cell(value: String)
 
   val table = (init: Table => Table) => {
@@ -18,11 +12,11 @@ object TableAPI {
 
   val row = (init: Row => Row) => (t: Table) => {
     val r = Row(Vector())
-    t.add(init(r))
+    Table(t.rows :+ init(r))
   }
 
   val cell = (str: String) => (r: Row) => {
-    r.add(Cell(str))
+    Row(r.cells :+ Cell(str))
   }
 }
 
