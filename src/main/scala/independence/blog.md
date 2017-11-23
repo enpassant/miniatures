@@ -80,7 +80,7 @@ A megoldás roppant egyszerű, az adott művelet végrehajtása helyett, létreh
 Mit nyerünk ezzel a megoldással?
 
 A folyamat végéig csak adatok áramolnak, ezért könnyen megoldható pure függvényekkel.
-Nem akarjuk lecserélni a az egyes függvényeinket, mert a tényleges lecserélendő utasításokat csak a folyamat után hajtatjuk végre. Az ottani végrehajtást viszont könnyedén cserélhetjük.
+Nem akarjuk lecserélni az egyes függvényeinket, mert a tényleges lecserélendő utasításokat csak a folyamat után hajtatjuk végre. Az ottani végrehajtást viszont könnyedén cserélhetjük.
 
 A fenti két ok miatt erős függőséget használhatunk, ezért a korábban leírt előnyeit kapjuk.
 
@@ -98,7 +98,7 @@ Sokkal rugalmasabb lesz a kódunk. Pl. szeretnénk megoldani, hogy:
 - ha Error hiba van, akkor csak a minimum Debug bejegyzéseket;
 - ha Fatal hiba van, akkor minden bejegyzést.
 
-Ezt a hagyományos programnál igen nehezen tudnánk megoldani, míg iennél a folyamat végén ott van minden adatunk, volt-e hiba, milyen hiba volt, miket szeretnénk naplózni, és ezek alapján könnyedén megcsinálhatjuk.
+Ezt a hagyományos programnál igen nehezen tudnánk megoldani, míg ennél a folyamat végén ott van minden adatunk, volt-e hiba, milyen hiba volt, miket szeretnénk naplózni, és ezek alapján könnyedén megcsinálhatjuk.
 
 Hiba esetén nem csak részletesebb naplóbejegyzéseket kapunk, hanem ott vannak az egész végrehajtás során született információk is, azokat is naplózhatjuk, így még sokkal könnyebbé válhat egy esetleges hiba javítása.
 

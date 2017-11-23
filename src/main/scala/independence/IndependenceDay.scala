@@ -64,12 +64,12 @@ object IndependenceDay extends App {
 
   def getUserId(idCookieOpt: Option[String]) = {
     for {
-      idCookie <- Result.asOption(idCookieOpt, "No id cookie!")
-      id <- Result.asTry(idCookie.toLong,
+      idCookie <- Result.fromOption(idCookieOpt, "No id cookie!")
+      id <- Result.fromTry(idCookie.toLong,
         Some(TextError("Id cookie is not a number")))
       if (id > 0)
       tripledId <- log(INFO, "id * 3", Result(id * 3))
-      userId <- Result.asEither(isUserIdOdd(tripledId))
+      userId <- Result.fromEither(isUserIdOdd(tripledId))
     } yield userId
   }
 
@@ -128,7 +128,7 @@ object IndependenceDay extends App {
       val tryTransaction = Try {
         smses foreach { sms => println(s"Send $sms") }
       }
-      Result.asTry(tryTransaction)
+      Result.fromTry(tryTransaction)
     }
   }
 
@@ -139,7 +139,7 @@ object IndependenceDay extends App {
       val tryTransaction = Try {
         emails foreach { email => println(s"Send $email") }
       }
-      Result.asTry(tryTransaction)
+      Result.fromTry(tryTransaction)
     }
   }
 
@@ -154,7 +154,7 @@ object IndependenceDay extends App {
 
         println("End transaction")
       }
-      Result.asTry(tryTransaction)
+      Result.fromTry(tryTransaction)
     }
   }
 

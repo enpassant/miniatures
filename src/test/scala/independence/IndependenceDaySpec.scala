@@ -21,7 +21,7 @@ class IndependenceDaySpec extends FunSpec with Matchers {
 
     it("should give BadResult if id is negative") {
       val result = getUserId(Option("-5"))
-      result shouldEqual BadResult(TextError("Predicate does not hold for -5"))
+      result shouldEqual BadResult(PredicateDoesNotHoldFor(-5))
     }
 
     it("should give BadResult if id is even") {
@@ -43,7 +43,7 @@ class IndependenceDaySpec extends FunSpec with Matchers {
     it("should give BadResult if id is negative") {
       val result = insertUser(Option("-7"), "als", "54", "asa")
       result should matchPattern {
-        case BadResult(TextError("Predicate does not hold for -7"), _) =>
+        case BadResult(PredicateDoesNotHoldFor(-7), _) =>
       }
       result.infos should contain allOf (
         Log(DEBUG, "validateUser", ""),

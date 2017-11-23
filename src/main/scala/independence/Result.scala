@@ -4,10 +4,15 @@ import scala.Enumeration
 import scala.reflect._
 import scala.util.{ Try, Success, Failure, Either, Left, Right }
 
-trait Error
+trait Fault
+trait Warning extends Fault
+trait Error extends Fault
+trait Fatal extends Fault
 
-case class TextError(cause: String) extends Error
-case class ExceptionError(cause: Throwable) extends Error
+case class TextError(cause: String) extends Fault
+case class ExceptionError(cause: Throwable) extends Fault
+
+case class PredicateDoesNotHoldFor[T](value: T) extends Fatal
 
 trait Information
 
@@ -21,15 +26,14 @@ sealed trait Result[+T] {
 
   def map[B](fn: T => B): Result[B] = flatMap(t => Result(fn(t)))
 
-  def check(p: T => Boolean, cause: String): Result[T] = this match {
+  def check(p: T => Boolean, makeCause: T => Fault): Result[T] = this match {
     case r @ GoodResult(v, i) if (p(v)) => r
-    case r @ GoodResult(v, i) =>
-      BadResult(TextError(String.format(cause, v.toString)), i)
+    case r @ GoodResult(v, i) => BadResult(makeCause(v), i)
     case r @ BadResult(c, i) => r
   }
 
   def filter(p: T => Boolean): Result[T] =
-    check(p, "Predicate does not hold for %s")
+    check(p, value => PredicateDoesNotHoldFor(value))
 
   def withFilter(p: T => Boolean): Result[T] = filter(p)
 
@@ -75,7 +79,7 @@ case class GoodResult[T](value: T, infos: Vector[Information] = Vector())
   }
 }
 
-case class BadResult(cause: Error, infos: Vector[Information] = Vector())
+case class BadResult(cause: Fault, infos: Vector[Information] = Vector())
   extends Result[Nothing]
 {
   def flatMap[B](fn: Nothing => Result[B]): Result[B] = this
@@ -86,18 +90,18 @@ case class BadResult(cause: Error, infos: Vector[Information] = Vector())
 object Result {
   def apply[T](value: T) = GoodResult(value)
 
-  def asOption[T](opt: Option[T], cause: String = "None") = opt match {
+  def fromOption[T](opt: Option[T], cause: String = "None") = opt match {
     case Some(value) => GoodResult(value)
     case None => BadResult(TextError(cause))
   }
 
-  def asTry[T](value: => T, cause: Option[Error] = None) = Try(value) match {
+  def fromTry[T](value: => T, cause: Option[Fault] = None) = Try(value) match {
     case Success(value) => GoodResult(value)
     case Failure(throwable) =>
       BadResult(cause getOrElse ExceptionError(throwable))
   }
 
-  def asEither[T](either: Either[Error, T], cause: Option[Error] = None) =
+  def fromEither[T](either: Either[Fault, T], cause: Option[Fault] = None) =
     either match {
       case Right(value) => GoodResult(value)
       case Left(left) =>
