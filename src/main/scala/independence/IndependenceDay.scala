@@ -13,6 +13,20 @@ object IndependenceDay extends App {
   case class DBUser(id: Long, name: String)
   case class DBContact(id: Long, mode: String, value: String)
 
+  case class Required(field: String, level: Level = ERROR) extends FieldFault
+  case class WrongNameFormat(field: String, level: Level = ERROR)
+    extends FieldFault
+  case class WrongPhoneFormat(field: String, level: Level = ERROR)
+    extends FieldFault
+  case class WrongEmailFormat(field: String, level: Level = ERROR)
+    extends FieldFault
+
+  case class IdCookieIsMissing(level: Level = ERROR) extends Fault
+  case class IdCookieIsNotNumber(level: Level = ERROR) extends Fault
+  case class UserIdMustBeOdd(level: Level = ERROR) extends Fault
+  case class MissingUserName(level: Level = ERROR) extends Fault
+  case class MissingDbStatement(level: Level = ERROR) extends Fault
+
   def validatorRequired = Validator((n: String) => !n.isEmpty, "required")
   def regexValidator(regex: String, cause: String) =
     Validator((n: String) => n.matches(regex), cause)
@@ -64,9 +78,8 @@ object IndependenceDay extends App {
 
   def getUserId(idCookieOpt: Option[String]) = {
     for {
-      idCookie <- Result.fromOption(idCookieOpt, "No id cookie!")
-      id <- Result.fromTry(idCookie.toLong,
-        Some(TextError("Id cookie is not a number")))
+      idCookie <- Result.fromOption(idCookieOpt, IdCookieIsMissing())
+      id <- Result.fromTry(idCookie.toLong, Some(IdCookieIsNotNumber()))
       if (id > 0)
       tripledId <- log(INFO, "id * 3", Result(id * 3))
       userId <- Result.fromEither(isUserIdOdd(tripledId))
@@ -76,7 +89,7 @@ object IndependenceDay extends App {
   def isUserIdOdd(id: Long) = if (id % 2 == 1) {
     Right(id)
   } else {
-    Left(TextError("User id must be odd"))
+    Left(UserIdMustBeOdd())
   }
 
   def persistUser(id: Long, user: User) = user.name match {
@@ -89,7 +102,7 @@ object IndependenceDay extends App {
       GoodResult(dbEntities, dbStatements)
 
     case _ =>
-      BadResult(TextError("Missing user name"))
+      BadResult(MissingUserName())
   }
 
   def sendMessages(
@@ -145,7 +158,7 @@ object IndependenceDay extends App {
 
   def runTransaction(dbStatements: Vector[DBStatement]) = {
     if (dbStatements.isEmpty) {
-      BadResult(TextError("There is no db statements in transaction"))
+      BadResult(MissingDbStatement())
     } else {
       val tryTransaction = Try {
         println("Begin transaction")

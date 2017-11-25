@@ -52,6 +52,8 @@ case class Validation(level: Symbol, field: String, message: String)
 
 case class Validator[T](predicate: T => Boolean, cause: String)
 
+case class FatalValidation(level: Level = ERROR) extends Fault
+
 object ResultOps {
   import Result._
 
@@ -69,7 +71,7 @@ object ResultOps {
       case _ => false
     }
     fatal match {
-      case Some(_) => BadResult(TextError("Fatal validation"))
+      case Some(_) => BadResult(FatalValidation())
       case _ => result
     }
   }

@@ -3,16 +3,20 @@ package independence
 import scala.Enumeration
 import scala.reflect._
 import scala.util.{ Try, Success, Failure, Either, Left, Right }
+import Level._
 
-trait Fault
-trait Warning extends Fault
-trait Error extends Fault
-trait Fatal extends Fault
+trait Fault {
+  def level: Level
+}
 
-case class TextError(cause: String) extends Fault
-case class ExceptionError(cause: Throwable) extends Fault
+trait FieldFault extends Fault {
+  def field: String
+}
 
-case class PredicateDoesNotHoldFor[T](value: T) extends Fatal
+case class ExceptionError(cause: Throwable, level: Level = ERROR) extends Fault
+
+case class PredicateDoesNotHoldFor[T](value: T, level: Level = FATAL)
+  extends Fault
 
 trait Information
 
@@ -90,9 +94,9 @@ case class BadResult(cause: Fault, infos: Vector[Information] = Vector())
 object Result {
   def apply[T](value: T) = GoodResult(value)
 
-  def fromOption[T](opt: Option[T], cause: String = "None") = opt match {
+  def fromOption[T](opt: Option[T], cause: Fault) = opt match {
     case Some(value) => GoodResult(value)
-    case None => BadResult(TextError(cause))
+    case None => BadResult(cause)
   }
 
   def fromTry[T](value: => T, cause: Option[Fault] = None) = Try(value) match {

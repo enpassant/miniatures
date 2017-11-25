@@ -11,12 +11,12 @@ class IndependenceDaySpec extends FunSpec with Matchers {
   describe("getUserId") {
     it("should give BadResult if no id") {
       val result = getUserId(None)
-      result shouldEqual BadResult(TextError("No id cookie!"))
+      result shouldEqual BadResult(IdCookieIsMissing())
     }
 
     it("should give BadResult if id is not a number") {
       val result = getUserId(Option("alma"))
-      result shouldEqual BadResult(TextError("Id cookie is not a number"))
+      result shouldEqual BadResult(IdCookieIsNotNumber())
     }
 
     it("should give BadResult if id is negative") {
@@ -27,7 +27,7 @@ class IndependenceDaySpec extends FunSpec with Matchers {
     it("should give BadResult if id is even") {
       val result = getUserId(Option("8"))
       result should matchPattern {
-        case BadResult(TextError("User id must be odd"), _) =>
+        case BadResult(UserIdMustBeOdd(_), _) =>
       }
     }
 
@@ -43,7 +43,7 @@ class IndependenceDaySpec extends FunSpec with Matchers {
     it("should give BadResult if id is negative") {
       val result = insertUser(Option("-7"), "als", "54", "asa")
       result should matchPattern {
-        case BadResult(PredicateDoesNotHoldFor(-7), _) =>
+        case BadResult(PredicateDoesNotHoldFor(-7, _), _) =>
       }
       result.infos should contain allOf (
         Log(DEBUG, "validateUser", ""),
@@ -55,14 +55,14 @@ class IndependenceDaySpec extends FunSpec with Matchers {
     it("should give BadResult if all parameter is empty") {
       val result = insertUser(Option("7"), "", "", "")
       result should matchPattern {
-        case BadResult(TextError("Fatal validation"), _) =>
+        case BadResult(FatalValidation(_), _) =>
       }
     }
 
     it("should give BadResult if name is wrong, others empty") {
       val result = insertUser(Option("7"), "Elek", "", "")
       result should matchPattern {
-        case BadResult(TextError("Missing user name"), _) =>
+        case BadResult(MissingUserName(_), _) =>
       }
     }
 
