@@ -14,6 +14,7 @@ trait FieldFault extends Fault {
 }
 
 case class ExceptionError(cause: Throwable, level: Level = ERROR) extends Fault
+case class OptionMissing(level: Level = ERROR) extends Fault
 
 case class PredicateDoesNotHoldFor[T](value: T, level: Level = FATAL)
   extends Fault
@@ -94,9 +95,9 @@ case class BadResult(cause: Fault, infos: Vector[Information] = Vector())
 object Result {
   def apply[T](value: T) = GoodResult(value)
 
-  def fromOption[T](opt: Option[T], cause: Fault) = opt match {
+  def fromOption[T](opt: Option[T], cause: Option[Fault]) = opt match {
     case Some(value) => GoodResult(value)
-    case None => BadResult(cause)
+    case None => BadResult(cause getOrElse OptionMissing())
   }
 
   def fromTry[T](value: => T, cause: Option[Fault] = None) = Try(value) match {

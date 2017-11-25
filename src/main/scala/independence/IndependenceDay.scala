@@ -78,7 +78,7 @@ object IndependenceDay extends App {
 
   def getUserId(idCookieOpt: Option[String]) = {
     for {
-      idCookie <- Result.fromOption(idCookieOpt, IdCookieIsMissing())
+      idCookie <- Result.fromOption(idCookieOpt, Some(IdCookieIsMissing()))
       id <- Result.fromTry(idCookie.toLong, Some(IdCookieIsNotNumber()))
       if (id > 0)
       tripledId <- log(INFO, "id * 3", Result(id * 3))
