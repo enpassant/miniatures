@@ -63,7 +63,9 @@ object Main extends App {
   {
     HttpServer.start(name, port){context => new Initializer(context) {
       val websockinit : WebsocketInitializer[E] = init(context.worker)
-      def onConnect = new WebsocketHttpHandler(_, websockinit, upgradePath, origins) {
+      def onConnect =
+        new WebsocketHttpHandler(_, websockinit, upgradePath, origins)
+      {
         override def handle = super.handle orElse httpHandler
       }
     }}
@@ -78,19 +80,29 @@ object Main extends App {
 
   val json : JValue   = ("message" -> "Hello, World!")
 
+  val serverHeader = HttpHeader("Server", "Colossus")
+  val plainTextHeader =
+    HttpHeader(HttpHeaders.ContentType, ContentType.TextPlain)
+  val jsonHeader =
+    HttpHeader(HttpHeaders.ContentType, ContentType.ApplicationJson)
+
+  val dateHeader = new DateHeader
+  val headers = HttpHeaders(serverHeader, dateHeader)
+
   start("hello-world", 9000, httpHandler = {
     case request @ Get on Root / "hello" => {
-      Callback.successful(request.ok("Hello World!"))
+      Callback.successful(request.ok("Hello World!", headers + plainTextHeader))
     }
     case request @ Get on Root / "json" => {
-      Callback.successful(request.ok(json))
+      Callback.successful(request.ok(json, headers + jsonHeader))
     }
 
   }) { worker => new WebsocketInitializer[RawString](worker) {
       def provideCodec() = new RawStringCodec
 
-      def onConnect = ctx => new WebsocketServerHandler[RawString](ctx) with ProxyActor {
-
+      def onConnect =
+        ctx => new WebsocketServerHandler[RawString](ctx) with ProxyActor
+      {
         def shutdownRequest() {
           upstream.connection.disconnect()
         }
