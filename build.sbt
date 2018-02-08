@@ -6,7 +6,7 @@ scalaVersion := "2.12.3"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
-javaOptions += "-Xmx512m"
+javaOptions += "-Xmx4512m"
 
 val akkaVersion = "2.5.4"
 
@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
   //"com.storm-enroute" %% "scalameter" % "0.8.2",
   "com.chuusai" %% "shapeless" % "2.3.2",
-  "com.tumblr" %% "colossus" % "0.10.1",
+  "com.tumblr" %% "colossus" % "0.11.0",
   "org.json4s"             %% "json4s-jackson"        % "3.5.3",
   "com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
   "com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
@@ -23,7 +23,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
   "com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
   "com.typesafe.akka"      %% "akka-http"             % "10.0.6",
-  "org.typelevel" %% "cats-core" % "0.9.0"
+  "io.monix"               %% "monix"                 % "2.3.0",
+  "org.typelevel" %% "cats-core" % "0.9.0",
+  "org.typelevel" %% "cats-free" % "0.9.0"
 )
 
 connectInput in run := true

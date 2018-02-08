@@ -1,26 +1,27 @@
 package colossus
 
-import colossus._
-import core._
-import controller._
-import service._
-import protocols.http._
+import colossus.core._
+import colossus.core.server.Server
+import colossus.controller._
 import colossus.protocols.http._
+import colossus.protocols.http.filters.HttpCustomFilters.CompressionFilter
 import colossus.protocols.websocket._
 import UrlParsing._
 import HttpMethod._
 import colossus.service.Callback.Implicits._
 import colossus.service.Callback
+import colossus.service.GenRequestHandler.PartialHandler
 import subprotocols.rawstring._
 import akka.actor.ActorSystem
 
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.JsonDSL._
+import scala.io.Source
 
 class HelloHandler(context: ServerContext) extends RequestHandler(context) {
   implicit object JsonBody extends HttpBodyEncoder[JValue] {
-    val contentType = Some(ContentType.ApplicationJson)
+    val contentType = ContentType.ApplicationJson
     def encode(json: JValue)  = {
       HttpBody(compact(render(json)))
     }
@@ -72,7 +73,7 @@ object Main extends App {
   }
 
   implicit object JsonBody extends HttpBodyEncoder[JValue] {
-    val contentType = Some(ContentType.ApplicationJson)
+    val contentType = ContentType.ApplicationJson
     def encode(json: JValue)  = {
       HttpBody(compact(render(json)))
     }
@@ -80,24 +81,88 @@ object Main extends App {
 
   val json : JValue   = ("message" -> "Hello, World!")
 
+  case object AcceptUrlOn {
+    def unapply(request: HttpRequest): Option[(HttpMethod, String, String)] = {
+      val component = request.head.url match {
+        case ""          => "/"
+        case url: String => url
+      }
+      request.head.headers.firstValue(HttpHeaders.Accept) map { accept =>
+        (request.head.method, component, accept)
+      }
+    }
+  }
+
+  case object AcceptOn {
+    def unapply(request: HttpRequest): Option[(HttpMethod, String)] = {
+      request.head.headers.firstValue(HttpHeaders.Accept) map { accept =>
+        (request.head.method, accept)
+      }
+    }
+  }
+
   val serverHeader = HttpHeader("Server", "Colossus")
+  val htmlHeader =
+    HttpHeader(HttpHeaders.ContentType, "text/html")
   val plainTextHeader =
     HttpHeader(HttpHeaders.ContentType, ContentType.TextPlain)
   val jsonHeader =
     HttpHeader(HttpHeaders.ContentType, ContentType.ApplicationJson)
+  val templateHeader =
+    HttpHeader(HttpHeaders.ContentType, "text/html+xml")
 
   val dateHeader = new DateHeader
   val headers = HttpHeaders(serverHeader, dateHeader)
 
-  start("hello-world", 9000, httpHandler = {
-    case request @ Get on Root / "hello" => {
-      Callback.successful(request.ok("Hello World!", headers + plainTextHeader))
+  val fromResource: String => String = resource =>
+    Source.fromResource(resource).getLines.reduce(_ + _)
+
+  def completePageC(render: Object => String, template: String)
+    (makeObject: => Option[JValue]): PartialHandler[Http] =
+  {
+    val resource = fromResource(template + ".hbs");
+
+    {
+      case request @ AcceptOn(Get, "text/html") =>
+        makeObject match {
+          case Some(obj) =>
+            request.ok(render(obj), headers + htmlHeader)
+          case _ =>
+            request.notFound("")
+        }
+      case request @ AcceptOn(Get, "application/json") =>
+        makeObject match {
+          case Some(obj) =>
+            request.ok(obj, headers + jsonHeader)
+          case _ =>
+            request.notFound("")
+        }
+      case request @ AcceptOn(Get, "text/html+xml") =>
+        request.ok(resource, headers + templateHeader)
+    }
+  }
+
+  val index = fromResource("index.html")
+  val handleBlogs = completePageC(o => s"Obj: $o", "blogs") {
+    None
+  }
+
+  val server: ServerRef = start("hello-world", 9000, httpHandler = new CompressionFilter()({
+    case request @ AcceptUrlOn(Get, "/hello", ContentType.TextPlain) => {
+      request.ok("Hello World!", headers + plainTextHeader)
     }
     case request @ Get on Root / "json" => {
-      Callback.successful(request.ok(json, headers + jsonHeader))
+      request.ok(json, headers + jsonHeader)
+    }
+    case request @ Get on Root / "file" => {
+      handleBlogs(request)
+    }
+    case request @ Get on Root / "shutdown" => {
+      Main.server.shutdown
+      request.ok("Shutting down", headers + plainTextHeader)
     }
 
-  }) { worker => new WebsocketInitializer[RawString](worker) {
+  })) { worker => new WebsocketInitializer[RawString](worker) {
       def provideCodec() = new RawStringCodec
 
       def onConnect =
