@@ -23,7 +23,7 @@ trait Information
 
 sealed trait Result[+T] {
 
-  def infos: Vector[Information]
+  def infos: List[Information]
 
   def ++[T](that: Result[T]): Result[T]
 
@@ -43,8 +43,8 @@ sealed trait Result[+T] {
   def withFilter(p: T => Boolean): Result[T] = filter(p)
 
   def addInformation(info: Information): Result[T] = this match {
-    case r @ GoodResult(v, i) => r.copy(infos = infos :+ info)
-    case r @ BadResult(c, i) => r.copy(infos = infos :+ info)
+    case r @ GoodResult(v, i) => r.copy(infos = info :: infos)
+    case r @ BadResult(c, i) => r.copy(infos = info :: infos)
   }
 
   def isGood = this match {
@@ -52,39 +52,40 @@ sealed trait Result[+T] {
     case _ => false
   }
 
-  def processInfos[I:ClassTag,R](processor: Vector[I] => Result[R]): Result[R] =
+  def processInfos[I:ClassTag,R](processor: List[I] => Result[R]): Result[R] =
     this match {
       case GoodResult(_, _) =>
         processAllInfos(processor)
       case b @ BadResult(_, _) => b
   }
 
-  def processAllInfos[I:ClassTag,R](processor: Vector[I] => Result[R]):
-  Result[R] = {
-    val infos = this.infos collect {
+  def processAllInfos[I:ClassTag,R](processor: List[I] => Result[R]):
+    Result[R] =
+  {
+    val infos = this.infos.reverse collect {
       case info: I => info
     }
     this ++ processor(infos)
   }
 }
 
-case class GoodResult[T](value: T, infos: Vector[Information] = Vector())
+case class GoodResult[T](value: T, infos: List[Information] = List())
   extends Result[T]
 {
   def flatMap[B](fn: T => Result[B]): Result[B] = {
     fn(value) match {
-      case r @ GoodResult(v, i) => r.copy(infos = infos ++ i)
-      case r @ BadResult(c, i) => r.copy(infos = infos ++ i)
+      case r @ GoodResult(v, i) => r.copy(infos = i ::: infos)
+      case r @ BadResult(c, i) => r.copy(infos = i ::: infos)
     }
   }
 
   def ++[T](that: Result[T]): Result[T] = that match {
-    case r @ GoodResult(v, i) => r.copy(infos = infos ++ i)
-    case r @ BadResult(c, i) => r.copy(infos = infos ++ i)
+    case r @ GoodResult(v, i) => r.copy(infos = i ::: infos)
+    case r @ BadResult(c, i) => r.copy(infos = i ::: infos)
   }
 }
 
-case class BadResult(cause: Fault, infos: Vector[Information] = Vector())
+case class BadResult(cause: Fault, infos: List[Information] = List())
   extends Result[Nothing]
 {
   def flatMap[B](fn: Nothing => Result[B]): Result[B] = this
@@ -119,7 +120,7 @@ object Result {
     if (p(value)) {
       GoodResult(Some(value))
     } else {
-      GoodResult(None, Vector(info))
+      GoodResult(None, List(info))
     }
   }
 }

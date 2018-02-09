@@ -2,12 +2,11 @@ package plainFP
 
 import independence._
 import independence.Level._
-import independence.ResultOps._
 
 object MonadLogger {
   def fact(x: Int): Result[Int] = for {
-    logFact <- log(INFO, "log1", GoodResult(s"fact: $x"))
-    logDiff <- log(DEBUG, "log2", GoodResult("log in here is different!"))
+    logFact <- LogResult("", INFO, "log1", s"fact: $x")
+    logDiff <- LogResult("", DEBUG, "log2", "log in here is different!")
     response <- MonadWebTools.wget(s"http://catpics.net/pic$x")
     factorial <- if (x == 1) GoodResult(1) else fact(x-1).map(_ * x)
   } yield factorial
@@ -22,7 +21,7 @@ object MonadLogger {
     }
   }
 
-  def processLog(place: String)(logs: Vector[Log]) = {
+  def processLog(place: String)(logs: List[Log]) = {
     logs foreach {
       case log @ Log(level, place_) if place == place_ =>
         println(f"/LOG/ [$level%5s] |$place%4s| ${log.message()}")
@@ -34,6 +33,6 @@ object MonadLogger {
 
 object MonadWebTools {
   def wget(url: String): Result[String] = {
-    log(INFO, "log2", GoodResult(s"Downloading $url"))
+    LogResult("", INFO, "log2", s"Downloading $url")
   }
 }

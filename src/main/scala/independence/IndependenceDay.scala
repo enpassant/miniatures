@@ -97,7 +97,7 @@ object IndependenceDay extends App {
       val dbPhone = user.phone map { phone => DBContact(id, "phone", phone) }
       val dbEmail = user.email map { email => DBContact(id, "email", email) }
       val dbUser = Some(DBUser(id, name))
-      val dbEntities = Vector(dbUser, dbPhone, dbEmail).flatten
+      val dbEntities = List(dbUser, dbPhone, dbEmail).flatten
       val dbStatements = dbEntities.map { e => DBPersist(e) }
       GoodResult(dbEntities, dbStatements)
 
@@ -108,7 +108,7 @@ object IndependenceDay extends App {
   def sendMessages(
     subject: String,
     message: String,
-    dbContacts: Vector[DBContact]) =
+    dbContacts: List[DBContact]) =
   {
     val messages = dbContacts map {
       case DBContact(_, "phone", phone) => Sms(phone, subject, message)
@@ -134,7 +134,7 @@ object IndependenceDay extends App {
     finalResult
   }
 
-  def sendSms(smses: Vector[Sms]) = {
+  def sendSms(smses: List[Sms]) = {
     if (smses.isEmpty) {
       Result(())
     } else {
@@ -145,7 +145,7 @@ object IndependenceDay extends App {
     }
   }
 
-  def sendEmail(emails: Vector[Email]) = {
+  def sendEmail(emails: List[Email]) = {
     if (emails.isEmpty) {
       Result(())
     } else {
@@ -156,7 +156,7 @@ object IndependenceDay extends App {
     }
   }
 
-  def runTransaction(dbStatements: Vector[DBStatement]) = {
+  def runTransaction(dbStatements: List[DBStatement]) = {
     if (dbStatements.isEmpty) {
       BadResult(MissingDbStatement())
     } else {
@@ -171,14 +171,14 @@ object IndependenceDay extends App {
     }
   }
 
-  def processValidation(validations: Vector[Validation]) = {
+  def processValidation(validations: List[Validation]) = {
     validations foreach { case Validation(level, field, message) =>
       println(s"Set $field field color by level $level. Message: $message")
     }
     Result(())
   }
 
-  def processLog(minLevel: Level)(logs: Vector[Log]) = {
+  def processLog(minLevel: Level)(logs: List[Log]) = {
     logs foreach {
       case log @ Log(level, place) if level >= minLevel =>
         println(s"/LOG/ [$level] |$place|.${log.message()}")
@@ -201,4 +201,3 @@ object IndependenceDay extends App {
   processResult(insertUser(Option("-7"), "", "54", "asa"))
   processResult(insertUser(Option("7"), "Teszt Elek", "(20)234-5678", "teszt@elek.hu"))
 }
-

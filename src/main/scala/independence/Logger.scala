@@ -17,18 +17,18 @@ object Logger {
         sb.append(". Output: ").append(output)
         val end = System.nanoTime
         sb.append(". Running time: ").append(end - start).append(" ns")
-        GoodResult(output, Vector(Log(level, place, sb.toString)))
+        GoodResult(output, List(Log(level, place, sb.toString)))
       } catch {
         case e: RuntimeException =>
           sb.append(". Exception: ").append(e.getMessage)
           val end = System.nanoTime
           sb.append(". Running time: ").append(end - start).append(" ns")
-          BadResult(ExceptionError(e), Vector(Log(FATAL, place, sb.toString)))
+          BadResult(ExceptionError(e), List(Log(FATAL, place, sb.toString)))
         case e: Exception =>
           sb.append(". Exception: ").append(e.getMessage)
           val end = System.nanoTime
           sb.append(". Running time: ").append(end - start).append(" ns")
-          BadResult(ExceptionError(e), Vector(Log(ERROR, place, sb.toString)))
+          BadResult(ExceptionError(e), List(Log(ERROR, place, sb.toString)))
       }
     } else {
       GoodResult(fn)
@@ -51,18 +51,18 @@ object Logger {
           sb.append(". Output: ").append(output)
           val end = System.nanoTime
           sb.append(". Running time: ").append(end - start).append(" ns")
-          GoodResult(output, Vector(Log(level, place, sb.toString)))
+          GoodResult(output, List(Log(level, place, sb.toString)))
         } catch {
           case e: RuntimeException =>
             sb.append(". Exception: ").append(e.getMessage)
             val end = System.nanoTime
             sb.append(". Running time: ").append(end - start).append(" ns")
-            BadResult(ExceptionError(e), Vector(Log(FATAL, place, sb.toString)))
+            BadResult(ExceptionError(e), List(Log(FATAL, place, sb.toString)))
           case e: Exception =>
             sb.append(". Exception: ").append(e.getMessage)
             val end = System.nanoTime
             sb.append(". Running time: ").append(end - start).append(" ns")
-            BadResult(ExceptionError(e), Vector(Log(ERROR, place, sb.toString)))
+            BadResult(ExceptionError(e), List(Log(ERROR, place, sb.toString)))
         }
     } else {
       input: I => GoodResult(fn(input))

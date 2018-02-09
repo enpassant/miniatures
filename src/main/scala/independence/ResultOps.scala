@@ -36,6 +36,12 @@ object Log {
   }
 }
 
+object LogResult {
+  def apply[T](value: T, level: Level, place: String, message: => String) = {
+    GoodResult(value, List(new Log(level, place, () => message)))
+  }
+}
+
 trait DBStatement extends Information
 
 case class DBPersist[T](entity: T) extends DBStatement
