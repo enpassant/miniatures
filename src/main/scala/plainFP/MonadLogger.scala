@@ -1,3 +1,5 @@
+package plainFP
+
 import independence._
 import independence.Level._
 import independence.ResultOps._
@@ -13,9 +15,11 @@ object MonadLogger {
   def main(args: Array[String]): Unit = {
     val in = 3
     val result = fact(in)
-    result.processInfos(processLog("log2"))
-    result.map(out => println(s"fact($in): $out"))
-    result.processInfos(processLog("log1"))
+    if (!args.contains("-t")) {
+      result.processInfos(processLog("log2"))
+      result.map(out => println(s"fact($in): $out"))
+      result.processInfos(processLog("log1"))
+    }
   }
 
   def processLog(place: String)(logs: Vector[Log]) = {

@@ -12,7 +12,7 @@ val akkaVersion = "2.5.4"
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.4" % "test",
-  //"com.storm-enroute" %% "scalameter" % "0.8.2",
+  "com.storm-enroute" %% "scalameter" % "0.9",
   "com.chuusai" %% "shapeless" % "2.3.2",
   "com.tumblr" %% "colossus" % "0.11.0",
   "org.json4s"             %% "json4s-jackson"        % "3.5.3",
