@@ -33,7 +33,7 @@ object RequestResponse {
   }
 
   def isGetMethod(request: Request) =
-    //request.method == "GET"
+    //request.method == GET
     request.method == GET || !request.contentType.isEmpty
   def isHelloPath(request: Request) =
     //request.path == "/hello"
@@ -64,7 +64,7 @@ object RequestResponse {
 
   def hello3(request: Request): Response = request match {
     case SimpleReq(GET, "/hello", content) => hello3BL(content)
-    //case Request("GET", "/hello", _, _, _, _, content) => hello3BL(content)
+    //case Request(GET, "/hello", _, _, _, _, content) => hello3BL(content)
     case _ => Response("400", "", "text/plain", "")
   }
 
