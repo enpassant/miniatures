@@ -5,23 +5,24 @@ import org.scalatest.Matchers._
 
 class RequestResponseSpec extends FunSpec with Matchers {
   import RequestResponse._
+  import Method._
 
   val badResponse = Response("400", "", "text/plain", "")
   val goodResponse = Response("200", "", "text/plain", "Hello John!")
 
   describe("hello") {
     it("should give good response") {
-      val request = Request("GET", "/hello", "", "", "", "", "john")
+      val request = Request(GET, "/hello", "", "", "", "", "john")
       val response = hello(request)
       response shouldEqual goodResponse
     }
     it("should give bad response if method is wrong") {
-      val request = Request("POST", "/hello", "???", "", "", "", "john")
+      val request = Request(POST, "/hello", "???", "", "", "", "john")
       val response = hello(request)
       response shouldEqual badResponse
     }
     it("should give bad response if path is wrong") {
-      val request = Request("GET", "/bye", "???", "", "", "", "john")
+      val request = Request(GET, "/bye", "???", "", "", "", "john")
       val response = hello(request)
       response shouldEqual badResponse
     }
@@ -29,12 +30,12 @@ class RequestResponseSpec extends FunSpec with Matchers {
 
   describe("isMethod") {
     it("should give true if method is equal") {
-      val request = Request("GET", "", "", "", "", "", "")
+      val request = Request(GET, "", "", "", "", "", "")
       val response = isGetMethod(request)
       response shouldEqual true
     }
     it("should give false if method is wrong") {
-      val request = Request("POST", "", "", "", "", "", "")
+      val request = Request(POST, "", "", "", "", "", "")
       val response = isGetMethod(request)
       response shouldEqual false
     }
@@ -42,12 +43,12 @@ class RequestResponseSpec extends FunSpec with Matchers {
 
   describe("isPath") {
     it("should give true if path is equal") {
-      val request = Request("", "/hello", "", "", "", "", "")
+      val request = Request(GET, "/hello", "", "", "", "", "")
       val response = isHelloPath(request)
       response shouldEqual true
     }
     it("should give false if path is wrong") {
-      val request = Request("", "/bye", "", "", "", "", "")
+      val request = Request(GET, "/bye", "", "", "", "", "")
       val response = isHelloPath(request)
       response shouldEqual false
     }
@@ -55,12 +56,12 @@ class RequestResponseSpec extends FunSpec with Matchers {
 
   describe("createHelloContent") {
     it("should give 'Hello John!'") {
-      val request = Request("", "", "", "", "", "", "john")
+      val request = Request(GET, "", "", "", "", "", "john")
       val response = createHelloContent(request)
       response shouldEqual "Hello John!"
     }
     it("should give 'Hello !' if name is empty") {
-      val request = Request("", "", "", "", "", "", "")
+      val request = Request(GET, "", "", "", "", "", "")
       val response = createHelloContent(request)
       response shouldEqual "Hello !"
     }

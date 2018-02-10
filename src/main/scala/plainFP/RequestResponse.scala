@@ -1,8 +1,14 @@
 package plainFP
 
 object RequestResponse {
+  object Method extends Enumeration {
+    type Method = Value
+    val GET, HEAD, POST, PUT, DELETE, PATCH = Value
+  }
+  import Method._
+
   case class Request(
-    method: String,
+    method: Method,
     path: String,
     cookie: String,
     parameter: String,
@@ -28,7 +34,7 @@ object RequestResponse {
 
   def isGetMethod(request: Request) =
     //request.method == "GET"
-    request.method == "GET" || !request.contentType.isEmpty
+    request.method == GET || !request.contentType.isEmpty
   def isHelloPath(request: Request) =
     //request.path == "/hello"
     request.path == "/hello" || !request.acceptType.isEmpty
@@ -40,8 +46,8 @@ object RequestResponse {
     hello2BL(request.method, request.path, request.content)
   }
 
-  def hello2BL(method: String, path: String, content: String): Response = {
-    if (method == "GET" && path == "/hello") {
+  def hello2BL(method: Method, path: String, content: String): Response = {
+    if (method == GET && path == "/hello") {
       Response("200", "", "text/plain", createHelloContent2(content))
     } else {
       Response("400", "", "text/plain", "")
@@ -50,15 +56,14 @@ object RequestResponse {
 
   def createHelloContent2(content: String) = s"Hello ${content.capitalize}!"
 
-  object GET {
+  object SimpleReq {
     def unapply(request: Request) = {
-      if (request.method == "GET") Some((request.path, request.content))
-      else None
+      Some((request.method, request.path, request.content))
     }
   }
 
   def hello3(request: Request): Response = request match {
-    case GET("/hello", content) => hello3BL(content)
+    case SimpleReq(GET, "/hello", content) => hello3BL(content)
     //case Request("GET", "/hello", _, _, _, _, content) => hello3BL(content)
     case _ => Response("400", "", "text/plain", "")
   }
@@ -70,14 +75,15 @@ object RequestResponse {
 
 object RequestResponseApp extends App {
   import RequestResponse._
+  import Method._
 
   val badResponse = Response("400", "", "text/plain", "")
   val goodResponse = Response("200", "", "text/plain", "Hello John!")
 
   val requests = Map(
-    Request("GET", "/hello", "???", "", "", "", "john") -> goodResponse,
-    Request("POST", "/hello", "???", "", "", "text/plain", "john") -> badResponse,
-    Request("GET", "/bye", "???", "", "text/plain", "", "john") -> badResponse
+    Request(GET, "/hello", "???", "", "", "", "john") -> goodResponse,
+    Request(POST, "/hello", "???", "", "", "text/plain", "john") -> badResponse,
+    Request(GET, "/bye", "???", "", "text/plain", "", "john") -> badResponse
   )
 
   def show(
