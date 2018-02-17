@@ -46,7 +46,7 @@ a) Az items és payment member változókban, paraméterekben bármi lehet, szá
 b) Az API és az implementáció egyben van, ami nehezíti az API megértését.
 
 Vannak _különös esetek_:
-1. Ha üres a kosár, akkor is megpróbálható eltávolítani belőle egy cikket.
+1. Ha üres a kosár, akkor is megpróbálható egy cikk eltávolítása.
 2. Ha üres a kosár, akkor is megpróbálható a fizetési funkció meghívása.
 3. Ha már fizetésre került a kosár, akkor is megpróbálható új cikk felvétele.
 4. Ha már fizetésre került a kosár, akkor is megpróbálható cikk eltávolítása.
@@ -94,36 +94,20 @@ Ha szem előtt tartjuk a fenti idézetet és segítségül hívjuk a típusokat,
 ```scala
 object ShoppingCartAPI {
   sealed trait ShoppingCart extends State
+  sealed trait EmptyOrActiveCart extends ShoppingCart
 
-  case object EmptyCart extends ShoppingCart
-  case class ActiveCart(unpaidItems: List[Item]) extends ShoppingCart
+  case object EmptyCart extends EmptyOrActiveCart
+  case class ActiveCart(unpaidItems: List[Item]) extends EmptyOrActiveCart
 
   case class PaidCart(
     paidItems: List[Item],
     payment: Payment
   ) extends ShoppingCart
 
-  case class AddItem(item: Item) extends Command
-  case class RemoveItem(item: Item) extends Command
-  case class Pay(payment: Payment) extends Command
-
-  case class FirstItemAdded(item: Item) extends Event
-  case class NextItemAdded(item: Item) extends Event
-  sealed trait ItemRemoved extends Event
-  case class AnItemRemoved(item: Item) extends ItemRemoved
-  case class LastItemRemoved(item: Item) extends ItemRemoved
-  case class Paid(payment: Payment) extends Event
-
-  type AddToEmpty = (EmptyCart.type, AddItem) => Either[Error, FirstItemAdded]
-  type AddToActive = (ActiveCart, AddItem) => Either[Error, NextItemAdded]
-  type RemoveFromActive = (ActiveCart, RemoveItem) => Either[Error, ItemRemoved]
-  type PayActive = (ActiveCart, Pay) => Either[Error, Paid]
-
-  type HandleFirstItemAdded = (EmptyCart.type, FirstItemAdded) => ActiveCart
-  type HandleNextItemAdded = (ActiveCart, NextItemAdded) => ActiveCart
-  type HandleAnItemRemoved = (ActiveCart, AnItemRemoved) => ActiveCart
-  type HandleLastItemRemoved = (ActiveCart, LastItemRemoved) => EmptyCart.type
-  type HandlePaid = (ActiveCart, Paid) => PaidCart
+  type AddToEmpty = (EmptyCart.type, AddItem) => Either[Error, ActiveCart]
+  type AddToActive = (ActiveCart, AddItem) => Either[Error, ActiveCart]
+  type RemoveFromActive = (ActiveCart, RemoveItem) => Either[Error, EmptyOrActiveCart]
+  type PayActive = (ActiveCart, Pay) => Either[Error, PaidCart]
 }
 
 ```
@@ -135,24 +119,18 @@ Az elején definiáljuk a vásárlói kosár állapotait (sealed = csak ezek az 
 2. ActiveCart, a kifizetetlen cikkeket tárolja, de nincs fizetési mód.
 3. PaidCart, a kifizetett cikkeket tárolja és a fizetési módot.
 
-Ez után definiáljuk az egyes kiadható parancsokat (AddItem, RemoveItem, Pay).
-
-Majd az egyes eseményeket, amik a parancsok hatására bekövetkezhetnek (FirstItemAdded, NextItemAdded, AnItemRemoved, LastItemRemoved, Paid).
-
-A következő részben az egyes parancsokat végrehajtó függvénytípusokat definiáljuk.
-
-Pl. AddToEmpty: a függvény EmptyCart állapotot és AddItem parancsot kap paraméterként, és vagy hibát ad vissza vagy a bekövetkező FirstItemAdded eseményt.
-
-A következő részben az egyes eseményeket kezelő függvénytípusokat definiáljuk.
-
-Pl. HandleLastItemRemoved: a függvény ActiveCart állapotot és LastItemRemoved eseményt kap paraméterként, amire EmptyCart állapotot ad vissza.
+Ez után definiáljuk az egyes kiadható parancsokati:
+1. AddToEmpty: hozzáad az üres kosárhoz egy cikket és vagy hibát kapunk, vagy az ActiveCart állapotot.
+2. AddToActive: hozzáad az aktív kosárhoz egy újabb cikket és vagy hibát kapunk, vagy egy újabb  ActiveCart állapotot.
+3. RemoveFromActive: kivesz egy cikket az aktív kosárból és vagy hibát kapunk, vagy egy EmptyCart vagy egy újabb ActiveCart állapotot.
+4. PayActive: kifizetésre kerül az aktív kosár és vagy hibát kapunk, vagy a PaidCart állapotot.
 
 Nézzük meg mely problémákat oldotta meg a típusok ilyetén használata!
 ----
 
-Nem szükséges külön dokumentáció, minden állapot, parancs, esemény, a parancsok hatása és az állapot változások részletesen benne vannak.
+Nem szükséges külön dokumentáció, minden állapot, parancs és az állapot változások részletesen benne vannak.
 
-Mivel minden egyes állapotra definiálva van, hogy mely parancsot lehet rajta végrehajtani, milyen állapotokat adhat vissza, az egyes állapotokból mely események mely állapotokba visznek át, ezért nem fordulhatnak elő a _különös esetek_!
+Mivel minden egyes állapotra definiálva van, hogy mely parancsot lehet rajta végrehajtani, milyen állapotokba vihetnek át, ezért nem fordulhatnak elő a _különös esetek_!
 
 A fenitek miatt nem szükséges a különös esetekhez szükséges dokumentáció, automatikus teszt, nem kell ezekre az implementációnál figyelni, és megszűntek az azokból eredő hiba lehetőségek és biztonsági kockázatok!
 
@@ -180,10 +158,18 @@ Az utolsó példa esetén nem lehetséges, hogy pl. egy már kifizetésre kerül
 Végszó
 ----
 
-Sajnos nem minden statikusan típusos nyelv ad ekkora segítséget a fentiekhez (pl. Java), mint a Scala, de azért van több is, használjuk azokat :-), sőt van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#) !
+Sajnos nem minden típusos nyelv ad ekkora segítséget a fentiekhez, mint a Scala, van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#, Haskell), de minden típusos nyelven (még a dinamikusokon is) a típusok segítségével lekorlátozhatjuk a reprezántalható állapotok körét, amivel:
+1. csökken a szükséges dokumentáció,
+2. csökken a szükséges automatikus tesztek száma,
+3. az implementációnál nem kell arra figyelni, hogy milyen korlátozások vannak,
+4. megszűnnek a hibás reprezentációból eredő hiba lehetőségek,
+5. megszűnnek a hibás reprezentációból eredő biztonsági kockázatok,
+6. az ügyfelet nem zargatjuk számukra érthetetlen hibaüzenetekkel.
+
+Eleinte többletmunkának tűnik, de bőségesen visszahozza a befektetett energiát.
 
 A fenti cikk létrejöveteléhez nagyban hozzájárult a [fsharpforfunandprofit](http://fsharpforfunandprofit.com/) oldal. Ez egy igazi aranybánya! Akik nem szeretik és/vagy nem használják az F#-ot, azoknak is érdemes végigböngészni, rengeteg jó videó és cikk található rajta.
 
-A hibakezelés, capability (képesség) alapú tervezés/programozás, FP egyszerűen és érthetően, és még további sok jó anyag található rajta; amik alapján akár további blogok is készülhetnek, természetesen Scala-ra adoptálva.
+A hibakezelés, capability (képesség) alapú tervezés/programozás, FP egyszerűen és érthetően, és még további sok jó anyag található rajta; amik alapján akár további blogok is készülhetnek.
 
 Happy typing! ;-)
