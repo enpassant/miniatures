@@ -24,8 +24,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
   "com.typesafe.akka"      %% "akka-http"             % "10.0.6",
   "io.monix"               %% "monix"                 % "2.3.0",
+  "org.eclipse.jetty" % "jetty-server" % "9.4.8.v20171121",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.typelevel" %% "cats-core" % "0.9.0",
-  "org.typelevel" %% "cats-free" % "0.9.0"
+  "org.typelevel" %% "cats-free" % "0.9.0",
+  "com.github.enpassant" %% "ickenham" % "1.1.0",
+  "com.googlecode.json-simple" % "json-simple" % "1.1.1"
 )
 
 connectInput in run := true
