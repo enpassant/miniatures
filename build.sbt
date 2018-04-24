@@ -4,7 +4,7 @@ version := "1.0"
 
 scalaVersion := "2.12.3"
 
-scalacOptions ++= Seq("-feature", "-deprecation")
+scalacOptions ++= Seq("-Ypartial-unification", "-feature", "-deprecation")
 
 javaOptions += "-Xmx4512m"
 
@@ -26,8 +26,9 @@ libraryDependencies ++= Seq(
   "io.monix"               %% "monix"                 % "2.3.0",
   "org.eclipse.jetty" % "jetty-server" % "9.4.8.v20171121",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "org.typelevel" %% "cats-core" % "0.9.0",
-  "org.typelevel" %% "cats-free" % "0.9.0",
+  "org.typelevel" %% "cats-core" % "1.1.0",
+  "org.typelevel" %% "cats-free" % "1.1.0",
+  "org.typelevel" %% "cats-effect" % "1.0.0-RC",
   "com.github.enpassant" %% "ickenham" % "1.4.1",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1"
 )
