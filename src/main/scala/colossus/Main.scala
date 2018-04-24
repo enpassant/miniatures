@@ -19,6 +19,9 @@ import org.json4s.jackson.JsonMethods._
 import org.json4s.JsonDSL._
 import scala.io.Source
 
+import com.github.enpassant.ickenham._
+import com.github.enpassant.ickenham.adapter.PlainAdapter
+
 class HelloHandler(context: ServerContext) extends RequestHandler(context) {
   implicit object JsonBody extends HttpBodyEncoder[JValue] {
     val contentType = ContentType.ApplicationJson
@@ -143,8 +146,40 @@ object Main extends App {
   }
 
   val index = fromResource("index.html")
-  val handleBlogs = completePageC(o => s"Obj: $o", "blogs") {
+  val handleBlogs = completePageC(o => s"Obj: $o", "comment") {
     None
+  }
+
+  val discussionPlain = Map(
+    "_id" -> 5,
+    "escape" -> "5 < 6",
+    "comments" -> List(
+      Map(
+        "commentId" -> "7",
+        "userName" -> "John",
+        "content" -> "<h1>Test comment 1</h1>",
+        "comments" -> List(
+          Map(
+            "commentId" -> "8",
+            "userName" -> "Susan",
+            "content" -> "<h2>Reply</h2>"
+          )
+        )
+      ),
+      Map(
+        "commentId" -> "9",
+        "userName" -> "George",
+        "content" -> "<h1>Test comment 2</h1>"
+      )
+    )
+  )
+
+  val ickenham = new Ickenham(new PlainAdapter())
+  val assembledFn = ickenham.compile("comment")
+
+  val handleWithIckenham = {
+    json: Any =>
+      assembledFn(List(json))
   }
 
   val server: ServerRef = start("hello-world", 9000, httpHandler = new CompressionFilter()({
@@ -156,6 +191,9 @@ object Main extends App {
     }
     case request @ Get on Root / "file" => {
       handleBlogs(request)
+    }
+    case request @ Get on Root / "ickenham" => {
+      request.ok(handleWithIckenham(discussionPlain), headers + htmlHeader)
     }
     case request @ Get on Root / "shutdown" => {
       Main.server.shutdown

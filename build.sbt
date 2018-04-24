@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.typelevel" %% "cats-core" % "0.9.0",
   "org.typelevel" %% "cats-free" % "0.9.0",
-  "com.github.enpassant" %% "ickenham" % "1.1.0",
+  "com.github.enpassant" %% "ickenham" % "1.4.1",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1"
 )
 
