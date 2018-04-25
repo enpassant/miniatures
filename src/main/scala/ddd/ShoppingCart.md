@@ -52,10 +52,53 @@ Vannak _különös esetek_:
 4. Ha már fizetésre került a kosár, akkor is megpróbálható cikk eltávolítása.
 5. Ha már fizetésre került a kosár, akkor is megpróbálható újabb fizetés indítása.
 
+Milyen gondot okozhatnak ezek?
+----
+
+### Nézzük először az a) pontot!
+
+Kifejezhető az az állapot, hogy a kosárhoz szám, szöveg vagy bármely nem Item típusú elemet adjunk, pl. így: shoppingCart.addItem(item.id) vagy shoppingCart.addItem(item.name). Ezek érvénytelen állapotok! Ha véletlenül (elírás vagy más okból) kifejezésre jut, akkor a program működésében hibát okozhat.
+
+1. Egyik megoldás, hogy reménykedünk, hogy nem lesz ilyen. Ha mégis lesz, akkor reméljük, hogy hamar kiderül és minél kevesebb kárt okoz.
+2. Másik megoldás, hogy vizsgáljuk, hogy érvénytelen állapotról van-e szó, ha igen, akkor hibát adunk. Ezzel az a probléma, hogy az ügyfél ilyen esetben olyan hibákat kaphat, amikkel nem nagyon tud mit kezdeni, pl. item.id-s elírás esetén: "Az 5 nem cikk, ezért nem lehet a kosárhoz adni!" vagy item.name-es elírás esetén: "Az iPhone nem cikk, ezért nem lehet a kosárhoz adni!".
+
+### Nézzük a b) pontot!
+
+Itt sajnos sokat nem tehetünk, dinamikusan típusos nyelveknél nem igazán lehet szétszedni az API-t az implementációtól.
+
+### Nézzük a különös eseteket!
+
+#### 1. Ha üres a kosár, akkor is megpróbálható egy cikk eltávolítása.
+
+Itt vélhetően sok problémánk nem lesz, hiszen üres a kosár, így nem fogjuk megtalálni benne a törlendő elemet. Ami egy kis gondot okozhat, hogy a felhasználónak kicsit érthetetlen hibaüzenet megy.
+
+#### 2. Ha üres a kosár, akkor is megpróbálható a fizetési funkció meghívása.
+
+Itt már több gondunk adódhat, hiszen a _payment_ nincs definiálva, így súlyos elszállásokat kaphatunk, érthetetlen hiba üzenetekkel.
+
+#### 3. Ha már fizetésre került a kosár, akkor is megpróbálható új cikk felvétele.
+
+Ez súlyos üzleti kockázatokat rejt!
+
+Nézzünk erre egy példát:
+1. A vásárló a kosarába tesz egy 1000 Ft-os tollat,
+2. kifizeti,
+3. a már kifizetett kosárhoz hozzáad egy 500e Ft-os iPhone-t.
+
+Ha ezután a szállításnál csak azt nézik, hogy kifizetésre került a kosár, ami igaz is, akkor kifogják szállítani az 500e Ft-os iPhone-t is, pedig a vásárló csak 1000 Ft-ot fizetett.
+
+Ezzel 500e Ft-os kár fogja érni a boltot!
+
+#### 4. Ha már fizetésre került a kosár, akkor is megpróbálható cikk eltávolítása.
+#### 5. Ha már fizetésre került a kosár, akkor is megpróbálható újabb fizetés indítása.
+
+Mit tehetünk, hogy a fenti problémákat elkerüljük?
+----
+
 - Szükséges a külön dokumentáció, ahol a fenti esetek mindegyikére ki kell térni részletesen, mit kell ellenőrizni, milyen hibát kell adni!
 - Mivel a dokumentáció és a kód szétválik, ezért a dokumentáció és a kód eltérhet egymástól, nem lehet tudni, hogy melyik az _igaz_ és melyiket kellene a másikhoz igazítani!
 - Minden fenti esetre szükséges az automatikus teszt, nehogy véletlenül előfordulhassanak a fentiek!
-- A fenti különös esetek erős biztonsági kockázatok, ráadásul az ügyintézők életét is megnehezíthetik, illetve komoly pénzekbe kerülhet az üzemeltető cégnek!
+- A fenti különös esetek erős biztonsági kockázatok, ráadásul az ügyintézők életét is megnehezíthetik, illetve komoly pénzekbe kerülhet az működtető cégnek!
 - Végül, az implementációnál is le kell kezelni minden különös esetet, kellenek az ellenőrzések és a hibaüzenetek!
 
 Nézzünk egy jellemző megoldást a statikusan típusos Scalaban:
@@ -93,7 +136,7 @@ Ha szem előtt tartjuk a fenti idézetet és segítségül hívjuk a típusokat,
 
 ```scala
 object ShoppingCartAPI {
-  sealed trait ShoppingCart extends State
+  sealed trait ShoppingCart
   sealed trait EmptyOrActiveCart extends ShoppingCart
 
   case object EmptyCart extends EmptyOrActiveCart
@@ -104,10 +147,10 @@ object ShoppingCartAPI {
     payment: Payment
   ) extends ShoppingCart
 
-  type AddToEmpty = (EmptyCart.type, AddItem) => Either[Error, ActiveCart]
-  type AddToActive = (ActiveCart, AddItem) => Either[Error, ActiveCart]
-  type RemoveFromActive = (ActiveCart, RemoveItem) => Either[Error, EmptyOrActiveCart]
-  type PayActive = (ActiveCart, Pay) => Either[Error, PaidCart]
+  type AddToEmpty = (EmptyCart.type, AddItem) => ActiveCart
+  type AddToActive = (ActiveCart, AddItem) => ActiveCart
+  type RemoveFromActive = (ActiveCart, RemoveItem) => EmptyOrActiveCart
+  type PayActive = (ActiveCart, Pay) => PaidCart
 }
 
 ```
@@ -115,56 +158,38 @@ object ShoppingCartAPI {
 Nézzük sorjában mi micsoda!
 
 Az elején definiáljuk a vásárlói kosár állapotait (sealed = csak ezek az állapotok vannak, amik ebben a fájlban találhatóak):
-1. EmptyCart, nem tartozik hozzá semmi, se cikk, se fizetési mód.
-2. ActiveCart, a kifizetetlen cikkeket tárolja, de nincs fizetési mód.
-3. PaidCart, a kifizetett cikkeket tárolja és a fizetési módot.
+1. EmptyCart, üres kosár, nem tartozik hozzá semmi, se cikk, se fizetési mód.
+2. ActiveCart, aktív kosár, a kifizetetlen cikkeket tárolja, de nincs fizetési mód.
+3. PaidCart, kifizetett kosár, a kifizetett cikkeket tárolja és a fizetési módot.
 
-Ez után definiáljuk az egyes kiadható parancsokati:
-1. AddToEmpty: hozzáad az üres kosárhoz egy cikket és vagy hibát kapunk, vagy az ActiveCart állapotot.
-2. AddToActive: hozzáad az aktív kosárhoz egy újabb cikket és vagy hibát kapunk, vagy egy újabb  ActiveCart állapotot.
-3. RemoveFromActive: kivesz egy cikket az aktív kosárból és vagy hibát kapunk, vagy egy EmptyCart vagy egy újabb ActiveCart állapotot.
-4. PayActive: kifizetésre kerül az aktív kosár és vagy hibát kapunk, vagy a PaidCart állapotot.
+Ez után definiáljuk az egyes kiadható parancsokat:
+1. AddToEmpty: hozzáad az üres kosárhoz egy cikket és egy ActiveCart állapotot kapunk vissza.
+2. AddToActive: hozzáad az aktív kosárhoz egy újabb cikket és egy újabb  ActiveCart állapotot kapunk vissza.
+3. RemoveFromActive: kivesz egy cikket az aktív kosárból és vagy egy EmptyCart vagy egy újabb ActiveCart állapotot kapunk vissza.
+4. PayActive: kifizetésre kerül az aktív kosár és egy PaidCart állapotot kapunk vissza.
 
 Nézzük meg mely problémákat oldotta meg a típusok ilyetén használata!
 ----
 
-Nem szükséges külön dokumentáció, minden állapot, parancs és az állapot változások részletesen benne vannak.
+Nem szükséges külön dokumentáció, minden állapot, parancs és az állapot változások részletesen benne vannak. Olyan, mint egy szövegesen leírt UML diagram.
 
 Mivel minden egyes állapotra definiálva van, hogy mely parancsot lehet rajta végrehajtani, milyen állapotokba vihetnek át, ezért nem fordulhatnak elő a _különös esetek_!
 
-A fenitek miatt nem szükséges a különös esetekhez szükséges dokumentáció, automatikus teszt, nem kell ezekre az implementációnál figyelni, és megszűntek az azokból eredő hiba lehetőségek és biztonsági kockázatok!
+Nem lehetséges, hogy pl. egy már kifizetésre került kosárhoz új cikket adjanak, vagy töröljenek belőle vagy újra kifizessék (lásd különös esetek). Egyszerűen nem tud olyan kódot írni a kliens programozó, aki a ShoppingCartAPI-t használja, hogy az hibásan leforduljon.
 
-Érvénytelen állapotot nem lehet kifejezni! /_Magyarázat_/
-----
-
-Az első példánál kifejezhető volt az az állapot, hogy a kosárhoz szám, szöveg vagy bármely nem Item típusú elemet adjunk, pl. így: shoppingCart.addItem(item.id) vagy shoppingCart.addItem(item.name). Ezek érvénytelen állapotok! Ha véletlenül (elírás vagy más okból) kifejezésre jut, akkor a program működésében hibát okozhat.
-
-1. Egyik megoldás, hogy reménykedünk, hogy nem lesz ilyen. Ha mégis lesz, akkor reméljük, hogy hamar kiderül és minél kevesebb kárt okoz.
-2. Másik megoldás, hogy vizsgáljuk, hogy érvénytelen állapotról van-e szó, ha igen, akkor hibát adunk. Ezzel az a probléma, hogy az ügyfél ilyen esetben olyan hibákat kaphat, amikkel nem nagyon tud mit kezdeni, pl. item.id-s elírás esetén: "Az 5 nem cikk, ezért nem lehet a kosárhoz adni!" vagy item.name-es elírás esetén: "Az iPhone nem cikk, ezért nem lehet a kosárhoz adni!".
-3. A harmadik megoldás az, hogy az érvénytelen állapotot nem engedjük kifejezhetővé tenni. A most látott esetre ilyenkor megoldás a második példa, ahol az addItem csak Item típust fogad el. A korábban látott item.id-s és item.name-es elírásokra egyszerűen fordítási hibákat fogunk kapni, mert azok az állapotok nem kifejezhetők.
-
-A második példa sem szűkítette le az állapotteret eléggé, a különös esetek érvénytelen állapotok, amik kifejezhetők voltak. Így előfordulhat, hogy egy már kifizetésre került kosárhoz újabb cikket adjanak. Pl. kifejezhető így:
-```scala
-shoppingCart.addItem(pen);
-shoppingCart.pay(mastercard);
-shoppingCart.addItem(iPhone);
-```
-
-Így egy 500Ft-os kifizetett kosárhoz hozzáadható az 500eFt-os iPhone (előző 1. pont). Ahhoz, hogy ezt elkerüljük az egyes metódusokat kiegészíthetjük vizsgálatokkal és hibaüzenetekkel (előző 2. pont).
-Avagy ezeket az érvénytelen állapotokat is kifejezhetetlenné tesszük (előző 3. pont), így jutunk el a 3. példához.
-Az utolsó példa esetén nem lehetséges, hogy pl. egy már kifizetésre került kosárhoz új cikket adjanak, vagy töröljenek belőle vagy újra kifizessék (lásd különös esetek). Egyszerűen nem tud olyan kódot írni a kliens programozó, aki a ShoppingCartAPI-t használja, hogy az hibásan leforduljon.
-
+A fenitek miatt nem szükséges a különös esetekhez szükséges dokumentáció, automatikus teszt, nem kell ezekre az implementációnál figyelni, és megszűnnek az azokból eredő hiba lehetőségek és biztonsági kockázatok!
 
 Végszó
 ----
 
-Sajnos nem minden típusos nyelv ad ekkora segítséget a fentiekhez, mint a Scala, van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#, Haskell), de minden típusos nyelven (még a dinamikusokon is) a típusok segítségével lekorlátozhatjuk a reprezántalható állapotok körét, amivel:
+Sajnos nem minden típusos nyelv ad ekkora segítséget a fentiekhez, mint a Scala, van olyan is, aminek a típusrendszere még egyszerűbb és kifejezőbb (pl. F#, Haskell), de minden típusos nyelven (még a dinamikusokon is) a típusok segítségével lekorlátozhatjuk a reprezentálható állapotok körét, amivel:
 1. csökken a szükséges dokumentáció,
 2. csökken a szükséges automatikus tesztek száma,
 3. az implementációnál nem kell arra figyelni, hogy milyen korlátozások vannak,
 4. megszűnnek a hibás reprezentációból eredő hiba lehetőségek,
 5. megszűnnek a hibás reprezentációból eredő biztonsági kockázatok,
-6. az ügyfelet nem zargatjuk számukra érthetetlen hibaüzenetekkel.
+6. megszűnnek a hibás reprezentációból eredő üzleti kockázatok,
+7. az ügyfelet nem zargatjuk számukra érthetetlen hiba üzenetekkel.
 
 Eleinte többletmunkának tűnik, de bőségesen visszahozza a befektetett energiát.
 
