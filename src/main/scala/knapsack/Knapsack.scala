@@ -1,7 +1,7 @@
 package knapsack
 
-import cats.Eval
-//import org.scalameter.api._
+import cats.effect.IO
+import org.scalameter.api._
 import scala.collection._
 
 object KnapsackImp {
@@ -30,15 +30,13 @@ object KnapsackImp {
 object KnapsackFP {
   def knapsack(maxWeight: Int, values: Seq[Int], weights: Seq[Int]): Int =
   {
-    def M(i: Int, j: Int): Eval[Int] = {
+    def M(i: Int, j: Int): IO[Int] = {
       if (i < 0) {
-        Eval.now(0)
+        IO(0)
       } else {
-        val value1 = Eval.defer{ M(i-1, j) }
+        val value1 = M(i-1, j)
         if (j >= weights(i)) {
-          val value2 = Eval.defer{
-            Eval.now(M(i-1, j-weights(i)).value + values(i))
-          }
+          val value2 = M(i-1, j-weights(i)).map(_ + values(i))
           for {
             v1 <- value1
             v2 <- value2
@@ -49,7 +47,7 @@ object KnapsackFP {
       }
     }
 
-    M(values.length-1, maxWeight).value
+    M(values.length-1, maxWeight).unsafeRunSync
   }
 }
 
@@ -77,16 +75,16 @@ object KnapsackMemo {
   }
 }
 
-/*
+//*
 object Knapsack extends Bench.LocalTime {
-  //val random = new scala.util.Random(1000)
-  //val length = random.nextInt(100) + 10
-  //val values = (1 to length) map { j => random.nextInt(10) + 1 }
-  //val weights = (1 to length) map { j => random.nextInt(10) + 1 }
+  val random = new scala.util.Random(1000)
+  val length = random.nextInt(10) + 10
+  val values = (1 to length) map { j => random.nextInt(10) + 1 }
+  val weights = (1 to length) map { j => random.nextInt(10) + 1 }
 
-  val length = 9
-  val values = Vector(3, 3, 5, 3, 7)
-  val weights = Vector(1, 2, 4, 2, 3)
+  //val length = 9
+  //val values = Vector(3, 3, 5, 3, 7)
+  //val weights = Vector(1, 2, 4, 2, 3)
 
   val retImp = KnapsackImp.knapsack(length, values, weights)
   val retFP = KnapsackFP.knapsack(length, values, weights)
@@ -95,7 +93,7 @@ object Knapsack extends Bench.LocalTime {
   println(s"result Imp: $retImp, FP: $retFP, Memo: $retMemo")
   //println(s"result Imp: $retImp, Memo: $retMemo")
 
-  if (false) {
+  if (true) {
 
   val sizes = Gen.range("size")(1, 10, 1)
 
@@ -110,11 +108,11 @@ object Knapsack extends Bench.LocalTime {
       }
     }
 
-    //measure method "FP" in {
-      //using(ranges) in {
-        //r => r.foreach(i => KnapsackFP.knapsack(length, values, weights))
-      //}
-    //}
+    measure method "FP" in {
+      using(ranges) in {
+        r => r.foreach(i => KnapsackFP.knapsack(length, values, weights))
+      }
+    }
 
     measure method "Memo" in {
       using(ranges) in {
@@ -124,4 +122,4 @@ object Knapsack extends Bench.LocalTime {
   }
   }
 }
-*/
+//*/
