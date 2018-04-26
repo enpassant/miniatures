@@ -1,9 +1,5 @@
 package com.example
 
-import shapeless._
-import syntax.singleton._
-import record._
-
 case class Item(name: String, price: Double)
 case class OrderedItem(itemId: String, quantity: Double)
 case class Order(id: String, customer: String, items: List[OrderedItem])
