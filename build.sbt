@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
   "com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
   "com.typesafe.akka"      %% "akka-http"             % "10.0.6",
-  "io.monix"               %% "monix"                 % "2.3.0",
+  "io.monix"               %% "monix"                 % "3.0.0-RC1",
   "org.eclipse.jetty" % "jetty-server" % "9.4.8.v20171121",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.typelevel" %% "cats-core" % "1.1.0",
