@@ -153,7 +153,7 @@ Ezzel a kis módosítással kiemeltük a programunk lényegi részét egy pure f
 * Tehát a unit tesztelhetőség rendben van.
 * A rétegezés is nagyjából rendben van, hiszen kívül, egy helyen vannak a külvilággal érintkező részek és belül, szeparálva az üzleti logika.
 * Az érthetőség is jó, sőt még jobb lett, mint az első esetben volt, mivel az üzleti logika ki van emelve és az önmagában is vizsgálható.
-- Amit veszítettünk az a `write` és `read` cserélhetősége.
+* Amit veszítettünk az a `write` és `read` futás közbeni cserélhetősége. Cserélni tudjuk, hiszen csak a `read` és `write` függvényeket kell átírni.
 
 Ha megfigyeljük a programunkat, akkor még két erős függőséget vehetünk észre benne:
 
