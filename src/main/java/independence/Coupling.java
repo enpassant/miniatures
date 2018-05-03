@@ -61,7 +61,7 @@ class Coupling {
         void write(String str);
     }
 
-    static class StdInWriter implements Writer {
+    static class StdOutWriter implements Writer {
         public void write(String str) {
             Coupling.write(str);
         }
@@ -88,7 +88,7 @@ class Coupling {
     public static void main(String[] args) {
         // Wiring
         LogicLooseCoupling logic =
-            new LogicLooseCoupling(new StdInReader(), new StdInWriter());
+            new LogicLooseCoupling(new StdInReader(), new StdOutWriter());
 
         final String type = (args.length < 1) ? "tight" : args[0];
         write("Coupling: " + type);
