@@ -151,7 +151,7 @@ Fogjuk meg az első programunkat és alakítsunk rajta egy kicsit:
 Ezzel a kis módosítással kiemeltük a programunk lényegi részét egy pure függvénybe (`createGreeting`), amit nagyon egyszerűen tudunk mockok nélkül is unit tesztelni. Pont ugyanolyan hatékonysággal, csak sokkal egyszerűbben, hiszen a szükséges inputot mock objektum nélkül, direktben adjuk át és az ellenőrzendő outputot szintén mock obkjektum nélkül, direktben kapjuk meg.
 
 * Tehát a unit tesztelhetőség rendben van.
-* A rétegezés is nagyjából rendben van, hiszen kívül, egy helyen vannak a külvilággal érintkező részek és belül, szeparálva az üzleti logika (lényege).
+* A rétegezés is nagyjából rendben van, hiszen kívül, egy helyen vannak a külvilággal érintkező részek és belül, szeparálva az üzleti logika.
 * Az érthetőség is jó, sőt még jobb lett, mint az első esetben volt, mivel az üzleti logika ki van emelve és az önmagában is vizsgálható.
 - Amit veszítettünk az a `write` és `read` cserélhetősége.
 
@@ -173,3 +173,15 @@ Tartsd fejben: **YAGNI!**
 
 Az igazán nagyon károsak az IoC containerek. Ami a nagy előnyük, azzal végeznek igazi pusztítást: *leveszik a programozó válláról a terhet az összekötések magadásáról és elrejtik ennek bonyolultságát előle*.
 **Ha csak nem fizetnek érte, soha ne használj IoC containert! ;-)**
+
+## References:
+
+* [Dependency Injection is EVIL - Tony Marston](http://www.tonymarston.net/php-mysql/dependency-injection-is-evil.html)
+
+* [Dependency Injection Makes Your Code Worse - Daniel Alexiuc](https://dzone.com/articles/dependency-injection-makes)
+
+* [From Dependency injection to dependency rejection - Mark Seemann - Youtube](https://www.youtube.com/watch?v=cxs7oLGrxQ4)
+
+* [Dependency rejection - Mark Seemann](http://blog.ploeh.dk/2017/02/02/dependency-rejection/)
+
+* [When does Dependency Injection become an anti-pattern? - David Lundgren](http://davidscode.com/blog/2015/04/17/when-does-dependency-injection-become-an-anti-pattern/)
