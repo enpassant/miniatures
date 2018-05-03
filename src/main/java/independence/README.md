@@ -167,7 +167,7 @@ Miért?
 
 Mi a tanulság a fentiek alapján?
 
-**A loose coupling (laza függőség) egyetlen előnye a cserélhetőség. Ha nincs szükséged cserélhetőségre, akkor nem szükséges a DI.**
+**A loose coupling (laza függőség) egyetlen előnye a futás közbeni cserélhetőség. Ha nincs szükséged futás közbeni cserélhetőségre, akkor nem szükséges a DI.**
 
 Tartsd fejben: **YAGNI!**
 
