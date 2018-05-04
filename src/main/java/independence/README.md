@@ -81,7 +81,7 @@ A programunk ezek alapján már így néz ki:
             this.writer = writer;
         }
 
-        public void runLogic() {
+        public void greet() {
             writer.write("Enter your name: ");
             String name = reader.read();
             String capitalizedName = capitalize(name);
@@ -89,7 +89,7 @@ A programunk ezek alapján már így néz ki:
             writer.write(greeting);
         }
 
-        public String capitalize(String str) {
+        private String capitalize(String str) {
             if (str.isEmpty()) return "UNKNOWN";
             else return str.substring(0, 1).toUpperCase() + str.substring(1);
         }
@@ -101,7 +101,7 @@ A programunk ezek alapján már így néz ki:
         // Wiring
         Greeting greeting = new Greeting(new StdInReader(), new StdOutWriter());
 
-        greeting.runLogic();
+        greeting.greet();
     }
 ```
 
@@ -126,7 +126,7 @@ Sajnos sok boilerplate kód került be, amik megnehezítik a megértést, de ugy
 
 **Miről nem tudunk, mi nem nyilvánvaló?**
 
-Nézzük meg a kódunk lényegi részét (`runLogic`)! Ha azt valaki megnézi, akkor tudja, hogy mit csinál az adott rész?
+Nézzük meg a kódunk lényegi részét (`greet`)! Ha azt valaki megnézi, akkor tudja, hogy mit csinál az adott rész?
 Sajnos nem, és ez elsőre nem nyilvánvaló!
 **A `Reader` és a `Writer` sorokról nem tudjuk, hogy mit csinálnak ténylegesen.** Sejtelmünk lehet, de amíg a futás során fel nem oldódik egy konkrét implementációban, addig bármit csinálhat, akár rakétákat is indíthat. Sokkal rosszabb a helyzet, mint az első programunknál, mert ott elnavigálhattunk a konkrét működésre és láttuk, hogy stdin-ről olvasnak, és stdout-ra írnak.
 Ennél a kódnál még annyiból jobb a helyzet, hogy a program belépési pontjától meg tudjuk keresni a függőségek összekötését (Wiring), és abból kibogozhatjuk, hogy melyik laza függőségnek épp mi lesz a megvalósítása. Ám amikor ez a gombolyag már nagyon nagy vagy amikor el van rejtve egy IoC container-ben, akkor erre esélyünk se nagyon lesz.
