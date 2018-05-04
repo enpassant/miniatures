@@ -43,13 +43,17 @@ class LooseCoupling {
             writer.write("Enter your name: ");
             String name = reader.read();
             String capitalizedName = capitalize(name);
-            String greeting = "Hello " + capitalizedName + "!";
+            String greeting = formatGreeting(capitalizedName);
             writer.write(greeting);
         }
 
         private static String capitalize(String str) {
             if (str.isEmpty()) return "UNKNOWN";
             else return str.substring(0, 1).toUpperCase() + str.substring(1);
+        }
+
+        public static String formatGreeting(String name) {
+            return "Hello " + name + "!";
         }
     }
 

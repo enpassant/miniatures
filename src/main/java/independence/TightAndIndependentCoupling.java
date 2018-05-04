@@ -23,6 +23,10 @@ class TightAndIndeendentCoupling {
         else return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static String formatGreeting(String name) {
+        return "Hello " + name + "!";
+    }
+
     public static void main(String[] args) {
         write("Enter your name: ");
         String name = read();
@@ -32,7 +36,7 @@ class TightAndIndeendentCoupling {
 
     public static String createGreeting(String name) {
         String capitalizedName = capitalize(name);
-        return "Hello " + capitalizedName + "!";
+        return formatGreeting(capitalizedName);
     }
 }
 
