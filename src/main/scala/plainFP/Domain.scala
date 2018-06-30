@@ -35,8 +35,8 @@ case class Comment(
 )
 
 object Domain extends App {
-  val userId: Id[User] = Id("1")
-  val postId: Id[Post] = Id("1")
+  val userId = Id[User]("1")
+  val postId = Id[Post]("1")
   val user = User(userId, Instant.now, new URI(""), "", false, false)
   val post = Post(postId, Instant.now, user.id, "", new URI(""), false)
 }
