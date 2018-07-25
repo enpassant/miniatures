@@ -15,13 +15,18 @@ object Fibonacci extends App {
   def run(args: List[String]): IO[Void, ExitStatus] =
     myAppLogic.attempt.map(_.fold(_ => 1, _ => 0)).map(ExitStatus.ExitNow(_))
 
-  def myAppLogic: IO[IOException, Unit] =
+  def myAppLogic: IO[AppError, Unit] =
     for {
       _ <- putStrLn("Hello! Which fibonacci value should calculate?")
+        .leftMap[AppError](AppException(_))
       n <- getStrLn
-      index <- IO.syncException(n.toInt).leftMap(_ => new IOException())
-      value <- fib(index).leftMap(_ => new IOException())
+        .leftMap[AppError](AppException(_))
+      index <- IO.syncException(n.toInt)
+        .leftMap[AppError](AppException(_))
+      value <- fib(index)
+        .leftMap[AppError](_ => NoneException)
       _ <- putStrLn(s"$index. fibonacci value is $value")
+        .leftMap[AppError](AppException(_))
     } yield ()
 
   def fib(n: Int): IO[Void, Int] =
