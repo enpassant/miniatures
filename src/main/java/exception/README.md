@@ -136,16 +136,16 @@ createPositive(-5).orElse(1);
 ### Either
 
 ```java
-Either<Failure, DatabaseConfig> databaseConfigOpt =
+Either<Failure, DatabaseConfig> databaseConfigResult =
     DatabaseConfig.load("conf/" + configFileName);
 
-Either<Failure, Repository> repositoryOpt =
-    databaseConfigOpt.flatMap(
+Either<Failure, Repository> repositoryResult =
+    databaseConfigResult.flatMap(
         databaseConfig -> Repository.load(
             databaseConfig.driver,
             databaseConfig.connectionUrl));
 
-repositoryOpt.flatMap(repository ->
+repositoryResult.flatMap(repository ->
     CommunicationConfig.loadFromDB(repository).map(
         communicationConfig ->
             Main.run(repository, communicationConfig))
@@ -182,6 +182,13 @@ Az Either-est látszólag elbonyolítják a lambdák, map-ek, flatMap-ek és a f
 Az egyszerű és a könnyen olvasható definíciójától függ, hogy ez tényleg így is van-e.
 Ha úgy definiáljuk ezeket, hogy ami kinézetre egyszerűbb, könnyebben olvasható, mert sokszor találkozom vele és ismerős a felépítése, akkor tényleg a try-catch az egyszerűbb.
 
+Egy másik lehetséges definíció erre, hogy amit könnyebb megírni, létrehozni.
+Ennek a definíciónak is megvan a maga előnye: ezen technikák és eszközök nagyon jók prototípusok létrehozásához. Ilyenek pl. dinamikus típusosság, exception, Dependency Injection container (DIc), annotation, ORM.
+
+Ismert, hogy általános projekteknél (nem prototípus), a kód megírásához képest, ami egyszer történik, a kód refaktorálása, módosítása ennek többszöröse, elég megnézni a verziókezelő rendszerünkben a módosítások számát, illetve ezekhez képest is a kód olvasása átlagosan tízszer annyiszor történik.
+
+Ezek alapján egyszerűség szempontjából célszerűbb ezeket inkább előtérbe helyezni!
+
 ## Egyszerűbb és könnyebben olvasható definíciója
 
 1. Minél kevesebb mindent kell a fejemben tartanom.
@@ -189,14 +196,47 @@ Ha úgy definiáljuk ezeket, hogy ami kinézetre egyszerűbb, könnyebben olvash
 3. Minél könnyebben tudom az adott kódot refaktorálni.
 4. Minél könnyebben tudom módosítani, úgy, hogy közben nem rontom el itt vagy máshol a program működését.
 5. Minél kevesebb hibalehetőség van.
-6. Minél könnyebben tudom az adott kódot újra felhasználni (compose).
+6. Minél könnyebben tudom az adott kódot újra felhasználni.
 
 Ezen definíció alapján viszont az Either-es megoldás sokkal egyszerűbb és könnyebben olvashatóbb. Nézzük meg ezeket részletesebben!
 
-### Az egyszerűség vizsgálata
+Nagyon jó videó a témában, Venkat Subramaniam
+[Az egyszerűség művészete](https://www.youtube.com/watch?v=R4C_JciDsuo)
+című előadása. Ennek a témának én olyan fontosságot tulajdonítok, hogy Bsc-n is és Msc-n is legalább egy-egy félévet szánnék a megismerésére, megértésére és alkalmazásának megtanulására.
 
-Ha megnézem a kódot, akkor Either esetén minden egyes függvényhívásról tudom, hogy adhat vissza hibát vagy sem. Ezt jelzi a visszatérési érték típusa, illetve a használt speciális függvény (pl. map, flatMap, forEachLeft).
+A fenti előadás nem szükséges ezen cikkhez, de annak megtekintése (akár többszöri), megértése nagyban javítja ennek a cikknek megértését is.
+
+Ez a téma elég hatalmas, ebben a cikkben csak a hibakezelés részére koncentrálunk.
+
+### Mi ad vissza hibát?
+
+Ha megnézem a kódot, akkor Either esetén minden egyes függvényhívásról tudom, hogy adhat vissza hibát vagy sem. Ezt jelzi a visszatérési érték típusa, illetve a használt speciális függvény (pl. map, flatMap).
 
 A try-catch esetén fogalmam sincs erről, csak annyit sejtek, hogy a try-catch-en belül valamelyik adhat vissza hibát, de ez sem biztos.
 
+Miért gond ez?
 
+Ha módosítani, refaktorálni akarom az adott kódot, akkor minden egyes sornál utána kell néznem a dokumentációban, hogy dob-e exceptiont. Még rosszabb, ha nincs jól vezetve, akkor a forrásokban kellene megnéznem teljes mélységben az összes függvény összes függvényét. Nem is elég ennek utánanéznem, hanem ezt mind meg is kell jegyezzem.
+
+### _"Az ezer GoTo általi halál"_
+
+Egy exception dobás tulajdonképpen ugyanaz, mintha egy goto utasítást hajtanánk végre. Ami kicsit még rosszabbá teszi, hogy pontosan nincs is meghatározva, hogy hová fog ugrani, ráadásul több helyre is ugorhat.
+
+Azt a függvényt, ahol dobjuk az exceptiont, több másik függvényből is hívhatjuk, azokat szintén, és így tovább. Nagyon bonyolult hívási gráfunk lehet, amelynek minden egyes ágán elkaphatjuk a dobott exceptiont. Ha megvan a hívási gráfunk és minden egyes lehetőséget végignéznénk, akkor még az is megnehezíti a dolgunkat, hogy nem feltétlen az adott exceptiont kapjuk el, hanem egy ősét. Tehát még az is egy nehezítő tényező, hogy tudnunk kell az exceptionök leszármazási hierarchiáját.
+
+### Hiba elfedése
+
+Ha egy try részen belül több utasítás is van, ami dobhatja a catch ágban elkapott hibát, akkor ezek elfedik egymást, nem tudhatjuk, hogy melyiket kapjuk el.
+Ugyanez a helyzet akkor is, ha egy metódus szignatúrájában throws kulcsszóval jelezzük a hiba dobását.
+
+**Mi a gond ezzel?**
+
+Azért tesszük egy try blokkba az utasításokat (vagy jelezzük throws kulcsszóval), mert mindegy melyik dobja a hibát.
+
+Ha a blokkban szereplő utasítások közül valamelyik nem dob olyan hibát, de később egy módosítás során már dob, akkor a fordítótól nem kapunk visszajelzést, hogy ezen részt át kellene nézzük, mert nem biztos, hogy úgy van kezelve ott a hiba, ahogyan számunkra megfelelő volna.
+
+### Checked exception
+
+A Checked exception egy öszvér megoldás, az exception kezelés hátrányait csak kissé csökkenti, miközben hozza a direkt hibakezelés (either) hátrányait, az előnyeiből csak nagyon keveset.
+
+[Ebben a cikkben](https://www.javaworld.com/article/3142626/core-java/are-checked-exceptions-good-or-bad.html) szépen össze vannak szedve a hátrányai és az előnyei a nem checked exceptionhöz képest.
