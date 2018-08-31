@@ -101,7 +101,7 @@ object Result {
     case None => BadResult(cause getOrElse OptionMissing())
   }
 
-  def fromTry[T](value: => T, cause: Option[Fault] = None) = Try(value) match {
+  def fromTry[T](value: => T, cause: => Option[Fault] = None) = Try(value) match {
     case Success(value) => GoodResult(value)
     case Failure(throwable) =>
       BadResult(cause getOrElse ExceptionError(throwable))

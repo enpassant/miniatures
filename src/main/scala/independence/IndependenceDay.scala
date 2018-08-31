@@ -1,5 +1,6 @@
 package independence
 
+import scala.util.Random
 import scala.util.Try
 
 object IndependenceDay extends App {
@@ -118,6 +119,7 @@ object IndependenceDay extends App {
   }
 
   def processResult(result: Result[_]) = {
+    println("[Start procesing]")
     val validationResult = result.processAllInfos(processValidation)
     val transactionResult = validationResult.processInfos(runTransaction)
     val emailResult = transactionResult.processInfos(sendEmail)
@@ -129,7 +131,7 @@ object IndependenceDay extends App {
         Console.err.println(smsResult)
         smsResult.processAllInfos(processLog(TRACE))
       }
-    println()
+    println("[End procesing]")
 
     finalResult
   }
@@ -138,10 +140,9 @@ object IndependenceDay extends App {
     if (smses.isEmpty) {
       Result(())
     } else {
-      val tryTransaction = Try {
+      Result.fromTry({
         smses foreach { sms => println(s"Send $sms") }
-      }
-      Result.fromTry(tryTransaction)
+      })
     }
   }
 
@@ -149,10 +150,9 @@ object IndependenceDay extends App {
     if (emails.isEmpty) {
       Result(())
     } else {
-      val tryTransaction = Try {
+      Result.fromTry({
         emails foreach { email => println(s"Send $email") }
-      }
-      Result.fromTry(tryTransaction)
+      })
     }
   }
 
@@ -160,14 +160,21 @@ object IndependenceDay extends App {
     if (dbStatements.isEmpty) {
       BadResult(MissingDbStatement())
     } else {
-      val tryTransaction = Try {
+      Result.fromTry({
         println("Begin transaction")
 
-        dbStatements foreach { dbStatement => println(s"Execute $dbStatement") }
+        dbStatements foreach { dbStatement =>
+          if (Random.nextInt(100) < 30) {
+            throw new RuntimeException(s"Fatal: $dbStatement")
+          }
+          println(s"Execute $dbStatement")
+        }
 
         println("End transaction")
-      }
-      Result.fromTry(tryTransaction)
+      }, {
+        println("Rollback transaction")
+        None
+      })
     }
   }
 
