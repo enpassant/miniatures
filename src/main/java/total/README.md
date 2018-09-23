@@ -73,7 +73,7 @@ Ez különösen akkor problémás, amikor a beérkező hibás érték és a füg
 
 Ha például van egy hívási láncunk: `a -> b -> c -> d -> e`, ahol a rendszerbe az `a`-nál került be a hibás érték (pl. felhasználói megadás, vagy külső service hívással), az érték feldolgozása az `e`-nél történik, akkor a visszaadott kivétel a `d`, `c`, `b` és `a` pontban is gondot okozhat.
 
-Amint látjuk, a parciális függvény használata nem egyszerű, mert figyelni kell a le nem kezelt esetekre, ezért a tesztelés sem egyszerű, a megértés sem az, így a módosítás sem az.
+Amint látjuk, a parciális függvény használata nem egyszerű, mert figyelni kell a le nem kezelt esetekre, ezért a tesztelés sem egyszerű, a megértés sem az, így a módosítás sem az, ráadásul könnyen hibás működést kaphatunk.
 
 ### Totális függvény
 
@@ -117,7 +117,7 @@ private static int percentStrict(int a, NotZeroInt b) {
 }
 ```
 
-Nézzük meg, hogy az így totálissá vált függvényünk használatát:
+Nézzük meg az így totálissá vált függvényünk használatát:
 
 ```
 pairs.stream()
@@ -128,6 +128,19 @@ pairs.stream()
 
 Egy nagyon kicsit bonyolultabb lett a használata, mivel a hívónak gondoskodnia kell arról, hogy a megfelelő típusú értéket előállítsa és az esetleges hibát, ami ott és akkor keletkezik, azt megfelelően lekezelje.
 
+Ha a hibás értékeket csak egyszerűen kihagyjuk az eredményből, akkor még szembeötlőbb a használat egyszerűsége.
+
+```
+pairs.stream()
+    .map(pair -> pair.rightOptMap(NotZeroInt::of))
+    .filter(Optional::isPresent)
+    .map(Optional::get)
+    .map(Total::percentStrict)
+    .forEach(System.out::println);
+```
+
+Ebből a használata mindössze ennyi: `.map(Total::percentStrict)`.
+
 A tesztelés nagyon egyszerű lett, hiszen csak egyetlen esetet kell tesztelnünk. Itt nem jelentkezik a korábbi probléma, hiszen a hívó nem kap vissza hibaértéket.
 
 Ha a korábban látott hívási láncot nézzük (`a -> b -> c -> d -> e`), akkor mindjárt az `a` pontnál át kell alakítanunk a bejött értéket a szigorúbb típusúvá, így már azonnal kezdenünk kell valamit a hibás értékkel, amit könnyedén meg is tudunk tenni (pl. a felhasználónak vagy a külső service-nek jelezzük a problémát).
@@ -137,4 +150,4 @@ Lefelé már csak a szükséges típus megy le, így nem fog gondot okozni se az
 
 Elsődlegesen olyan totális függvényeket használjunk, ahol az input köre le van szűkítve a legális állapotokra, ha ez nem megy valamiért, akkor a visszatérési értékek körét bővítsük, hogy totális függvényünk legyen!
 
-Ami elsőre többlet munkának tűnik (NotZeroInt létrehozása), az többszöresen megtérül az egyszerűbb feldolgozásnál, az egyszerűbb teszteknél, az érthetőbb, hibamentesebb és jól karbantartható kódnál!
+Ami elsőre többlet munkának tűnik (`NotZeroInt` létrehozása), az többszöresen megtérül az egyszerűbb feldolgozásnál, az egyszerűbb teszteknél, az érthetőbb, hibamentesebb és jól karbantartható kódnál!
