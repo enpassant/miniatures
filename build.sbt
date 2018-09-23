@@ -8,8 +8,6 @@ scalacOptions ++= Seq("-Ypartial-unification", "-feature", "-deprecation")
 
 javaOptions += "-Xmx4512m"
 
-resolvers += Resolver.sonatypeRepo("snapshots")
-
 val akkaVersion = "2.5.4"
 
 libraryDependencies ++= Seq(
@@ -32,7 +30,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-free" % "1.1.0",
   "org.typelevel" %% "cats-effect" % "1.0.0-RC",
   "com.github.enpassant" %% "ickenham" % "1.4.1",
-  "org.scalaz" %% "scalaz-zio" % "0.1-SNAPSHOT",
+  "org.scalaz" %% "scalaz-zio" % "0.1.0-dc8b6a3",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1"
 )
 
