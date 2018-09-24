@@ -107,8 +107,8 @@ Az a probléma itt is megmarad, hogy a hívó szembesülhet azzal, hogy nem tud 
 #### Input körének szűkítése
 
 Másik megoldás a parciális függvény totálissá tételéhez az, hogy az érvénytelen input értéket, megfelelő típussal, kizárjuk a megadható értékek köréből.
-Ezt a megoldást angolul így hívják: Make illegal state unrepresentable.
-Készítsünk egy [NotZeroInt](https://github.com/enpassant/miniatures/blob/master/src/main/java/total/NotZeroInt.java) osztályt, amivel csak nem nulla értékű egész számok reprezentálhatók.
+Ezt az elvet (Make illegal state unrepresentable) nem csak az inputoknál, hanem mindenhol használhatjuk, ahol adatokat reprezentálunk.
+Készítsünk egy [NotZeroInt](https://github.com/enpassant/miniatures/blob/master/src/main/java/total/NotZeroInt.java) osztályt, amivel csak `nem nulla értékű egész számok` reprezentálhatók.
 Ennek használatával így néz ki a százalék számoló függvényünk:
 
 ```
