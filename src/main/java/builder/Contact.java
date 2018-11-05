@@ -34,16 +34,20 @@ public class Contact {
         return builder -> builder.phone("55/555-555");
     }
 
+    private static ContactBuilder companyEmail(ContactBuilder builder) {
+        return builder.email("test@company.com");
+    }
+
     public static void main(String[] args) {
-        Optional<Contact> contact1 = Contact.create(builder ->
-            builder.email("test@company.com"));
+        Optional<Contact> contact1 = Contact.create(Contact::companyEmail);
         System.out.println("Contact1: " + contact1);
 
         Optional<Contact> contact2 = Contact.create(builder -> {});
         System.out.println("Contact2: " + contact2);
 
         Optional<Contact> contact3 = Contact.create(
-            companyPhone().andThen(builder -> builder.email("test@company.com")));
+            companyPhone().andThen(Contact::companyEmail)
+        );
         System.out.println("Contact3: " + contact3);
     }
 
