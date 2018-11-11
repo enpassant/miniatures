@@ -12,31 +12,31 @@ public class Total {
         Pair.of(2, 8)
     );
 
-    private static int percent(int a, int b) {
-        return a * 100 / b;
+    private static long percent(int a, int b) {
+        return a * 100L / b;
     }
 
-    private static int percent(Pair<Integer, Integer> pair) {
+    private static long percent(Pair<Integer, Integer> pair) {
         return percent(pair.left, pair.right);
     }
 
-    private static Optional<Integer> percentOptional(int a, int b) {
+    private static Optional<Long> percentOptional(int a, int b) {
         if (b == 0) {
             return Optional.empty();
         } else {
-            return Optional.of(a * 100 / b);
+            return Optional.of(a * 100L / b);
         }
     }
 
-    private static Optional<Integer> percentOptional(Pair<Integer, Integer> pair) {
+    private static Optional<Long> percentOptional(Pair<Integer, Integer> pair) {
         return percentOptional(pair.left, pair.right);
     }
 
-    private static int percentStrict(int a, NotZeroInt b) {
-        return a * 100 / b.number;
+    private static long percentStrict(int a, NotZeroInt b) {
+        return a * 100L / b.number;
     }
 
-    private static int percentStrict(Pair<Integer, NotZeroInt> pair) {
+    private static long percentStrict(Pair<Integer, NotZeroInt> pair) {
         return percentStrict(pair.left, pair.right);
     }
 
