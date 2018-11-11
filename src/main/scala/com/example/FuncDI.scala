@@ -10,9 +10,9 @@ case class MissingItem(id: ItemID) extends Error
 case object NoSpaceOnDisk extends Error
 
 object result {
-  type Result[A] = EitherT[IO, Error, A]
+  type ResultIO[A] = EitherT[IO, Error, A]
 
-  def makeLogged[I, O](fn: I => Result[O])(input: I): Result[O] = {
+  def makeLogged[I, O](fn: I => ResultIO[O])(input: I): ResultIO[O] = {
     println(s"LOG. input: $input")
     fn(input).flatMap { output: O =>
       println(s"LOG. output: $output")
@@ -33,12 +33,12 @@ object StoreAPI {
   case class OrderRequest(order: Order)
   case class OrderResponse(status: Either[Error, Double])
 
-  type PlaceOrder = OrderRequest => Result[OrderResponse]
+  type PlaceOrder = OrderRequest => ResultIO[OrderResponse]
 }
 
 object DatabaseAPI {
-  type GetItem = ItemID => Result[Item]
-  type SaveOrder = Order => Result[Order]
+  type GetItem = ItemID => ResultIO[Item]
+  type SaveOrder = Order => ResultIO[Order]
 }
 
 object MemDatabase {
@@ -65,7 +65,7 @@ object Store {
   import DatabaseAPI._
   import StoreAPI._
 
-  val getItems: GetItem => OrderRequest => Result[List[(Item, OrderedItem)]] = {
+  val getItems: GetItem => OrderRequest => ResultIO[List[(Item, OrderedItem)]] = {
     getItem => request =>
     (request.order.items.map {
       orderedItem => getItem(orderedItem.itemId).map((_, orderedItem))
