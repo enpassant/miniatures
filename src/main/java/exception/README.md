@@ -240,3 +240,66 @@ Ha a blokkban szereplő utasítások közül valamelyik nem dob olyan hibát, de
 A Checked exception egy öszvér megoldás, az exception kezelés hátrányait csak kissé csökkenti, miközben hozza a direkt hibakezelés (either) hátrányait, az előnyeiből csak nagyon keveset.
 
 [Ebben a cikkben](https://www.javaworld.com/article/3142626/core-java/are-checked-exceptions-good-or-bad.html) szépen össze vannak szedve a hátrányai és az előnyei a nem checked exceptionhöz képest.
+
+### Példák
+
+Sokkal könnyebben érthető, ha nézünk a fentiekre egy pár példát.
+
+Induljunk el ezzel:
+
+```java
+    private static int calc(int value) {
+        return calcAB(
+            calcA(value),
+            calcB(value)
+        );
+    }
+```
+, ahol a `calcA`, `calcB` és `calcAB` szignatúrája ilyen:
+```java
+    private static int calcA(int value);
+    private static int calcB(int value);
+    private static int calcAB(int a, int b);
+```
+
+Ennyiből sajnos fogalmunk sincs, hogy dob-e valamelyik exceptiont. Ahhoz, hogy ezt megtudjuk végig kell nézzük a `calcA`, `calcB` és `calcAB` forrását és az azokból hívott összes metódus forrását, és így tovább.
+
+Legyenek a következő egyszerű megvalósítások:
+```java
+    private static int calcA(int value) {
+        return value * 5;
+    }
+
+    private static int calcB(int value) {
+        return 10000 / (20 - calcA(10 - value));
+    }
+
+    private static int calcAB(int a, int b) {
+        return a + b;
+    }
+```
+Nagyon egyszerű megvalósítások, mindenhol csak az alap aritmetikai műveleteket alkalmaztuk.
+Remek, akkor ezek biztosan nem adnak hibát!
+A látszat ismét csal!
+Az osztás művelet sajnot exception-t dob, ha nullával akarjuk osztani az osztandót.
+Ha átírjuk a `calcB` függvényt ilyenre:
+```java
+    private static int calcB(int value) {
+        if ((20 - calcA(10 - value)) == 0) {
+            throw new ArithmeticException("/ by zero");
+        }
+        return 10000 / (20 - calcA(10 - value));
+    }
+}
+```
+, akkor a működés pontosan ugyanaz marad, de sokkal szembeötlőbbé válik, hogy ez a függvény hibát dob bizonyos esetekben.
+
+Még jobb, ha a szignatúrában (is) jelezzük, hogy ez a függvény hibát dob:
+```java
+    private static int calcB(int value) throws ArithmeticException {
+        return 10000 / (20 - calcA(10 - value));
+    }
+}
+```
+, mert ilyenkor a függvény dokumentációjából is már látszik, nem kell a forrását megnézni.
+
