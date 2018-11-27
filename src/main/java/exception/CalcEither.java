@@ -1,5 +1,9 @@
 package exception;
 
+import java.util.stream.IntStream;
+import java.util.stream.Collectors;
+import java.util.Optional;
+
 public class CalcEither {
     public static Either<Failure, Integer> calc(int value) {
         final int a = calcA(value);
@@ -31,6 +35,34 @@ public class CalcEither {
 
         final int result3 = calc(6).orElse(0).get();
         System.out.println("Result3: " + result3);
+
+        System.out.println("Result4: " +
+            IntStream
+                .range(1, 20)
+                .mapToObj(CalcEither::calc)
+                .map(v ->v.orElse(0).get())
+                .collect(Collectors.toList())
+        );
+
+        System.out.println("Result5: " +
+            IntStream
+                .range(1, 20)
+                .mapToObj(CalcEither::calc)
+                .map(Either::right)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList())
+        );
+
+        System.out.println("Result6: " +
+            IntStream
+                .range(1, 20)
+                .mapToObj(CalcEither::calc)
+                .map(Either::left)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList())
+        );
     }
 }
 
