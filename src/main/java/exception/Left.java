@@ -6,14 +6,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class Left<L, R> implements Either<L, R> {
-    private final L left;
+    private final L value;
 
     private Left(L l) {
-        left = l;
+        value = l;
     }
 
     public static <L, R> Left<L, R> of(L l) {
-        return new Left<L, R>(l);
+        return new Left<>(l);
     }
 
     @SuppressWarnings("unchecked")
@@ -22,10 +22,20 @@ public final class Left<L, R> implements Either<L, R> {
         return (Either<L, B>) this;
     }
 
+    @Override
+    public <B> Either<B, R> mapLeft(Function<L, B> f) {
+        return new Left<>(f.apply(value));
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <B> Either<L, B> flatMap(Function<R, Either<L, B>> f) {
         return (Either<L, B>) this;
+    }
+
+    @Override
+    public <B> Either<B, R> flatMapLeft(Function<L, Either<B, R>> f) {
+        return f.apply(value);
     }
 
     @SuppressWarnings("unchecked")
@@ -41,7 +51,7 @@ public final class Left<L, R> implements Either<L, R> {
 
     @Override
     public Either<L, R> forEachLeft(Consumer<L> f) {
-        f.accept(left);
+        f.accept(value);
         return this;
     }
 
@@ -52,7 +62,7 @@ public final class Left<L, R> implements Either<L, R> {
 
     @Override
     public Optional<L> left() {
-        return Optional.of(left);
+        return Optional.of(value);
     }
 
     @Override
@@ -67,22 +77,24 @@ public final class Left<L, R> implements Either<L, R> {
 
     @Override
     public String toString() {
-        return "Left(" + left + ")";
+        return "Left(" + value + ")";
     }
 
     @Override
     public boolean equals(Object value) {
-        if (value == this) return true;
+        if (value == this) {
+            return true;
+        }
         if (value instanceof Left) {
             @SuppressWarnings("unchecked")
             Left<L, R> valueLeft = (Left<L, R>) value;
-            return left.equals(valueLeft.left().get());
+            return this.value.equals(valueLeft.left().get());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return left.hashCode();
+        return value.hashCode();
     }
 }
