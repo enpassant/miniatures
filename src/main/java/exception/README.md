@@ -235,6 +235,8 @@ Azért tesszük egy try blokkba az utasításokat (vagy jelezzük throws kulcssz
 
 Ha a blokkban szereplő utasítások közül valamelyik nem dob olyan hibát, de később egy módosítás során már dob, akkor a fordítótól nem kapunk visszajelzést, hogy ezen részt át kellene nézzük, mert nem biztos, hogy úgy van kezelve ott a hiba, ahogyan számunkra megfelelő volna.
 
+### Nem újrafelhasználható
+
 ### Checked exception
 
 A Checked exception egy öszvér megoldás, az exception kezelés hátrányait csak kissé csökkenti, miközben hozza a direkt hibakezelés (either) hátrányait, az előnyeiből csak nagyon keveset.
@@ -245,36 +247,37 @@ A Checked exception egy öszvér megoldás, az exception kezelés hátrányait c
 
 Sokkal könnyebben érthető, ha nézünk a fentiekre egy pár példát.
 
+[Mi ad vissza hibát?](#mi-ad-vissza-hib-t-)
+
 Induljunk el ezzel:
 
+, ahol a `calc`, `calcA`, `calcB` és `calcAB` szignatúrája ilyen:
 ```java
-    private static int calc(int value) {
-        return calcAB(
-            calcA(value),
-            calcB(value)
-        );
-    }
-```
-, ahol a `calcA`, `calcB` és `calcAB` szignatúrája ilyen:
-```java
-    private static int calcA(int value);
-    private static int calcB(int value);
-    private static int calcAB(int a, int b);
+    public static int calc(int value);
+    public static int calcA(int value);
+    public static int calcB(int value);
+    public static int calcAB(int a, int b);
 ```
 
 Ennyiből sajnos fogalmunk sincs, hogy dob-e valamelyik exceptiont. Ahhoz, hogy ezt megtudjuk végig kell nézzük a `calcA`, `calcB` és `calcAB` forrását és az azokból hívott összes metódus forrását, és így tovább.
 
 Legyenek a következő egyszerű megvalósítások:
 ```java
-    private static int calcA(int value) {
+    public static int calc(int value) {
+        final int a = calcA(value);
+        final int b = calcB(value);
+        return calcAB(a, b);
+    }
+
+    public static int calcA(int value) {
         return value * 5;
     }
 
-    private static int calcB(int value) {
+    public static int calcB(int value) {
         return 10000 / (20 - calcA(10 - value));
     }
 
-    private static int calcAB(int a, int b) {
+    public static int calcAB(int a, int b) {
         return a + b;
     }
 ```
@@ -284,11 +287,12 @@ A látszat ismét csal!
 Az osztás művelet sajnot exception-t dob, ha nullával akarjuk osztani az osztandót.
 Ha átírjuk a `calcB` függvényt ilyenre:
 ```java
-    private static int calcB(int value) {
-        if ((20 - calcA(10 - value)) == 0) {
+    public static int calcB(int value) {
+        final int divisor = (20 - calcA(10 - value));
+        if (divisor == 0) {
             throw new ArithmeticException("/ by zero");
         }
-        return 10000 / (20 - calcA(10 - value));
+        return 10000 / divisor;
     }
 }
 ```
@@ -296,10 +300,43 @@ Ha átírjuk a `calcB` függvényt ilyenre:
 
 Még jobb, ha a szignatúrában (is) jelezzük, hogy ez a függvény hibát dob:
 ```java
-    private static int calcB(int value) throws ArithmeticException {
+    public static int calcB(int value) throws ArithmeticException {
         return 10000 / (20 - calcA(10 - value));
     }
 }
 ```
 , mert ilyenkor a függvény dokumentációjából is már látszik, nem kell a forrását megnézni.
+Ugyanezt meg kell csinálnunk az összes olyan függvényen, amely ezt a függvényt hívja, a példánknál a `calc` függvényre is.
 
+Nézzük meg ugyanezt `Either`-rel:
+```java
+    public static int calcA(int value);
+    public static Either<Failure, Integer> calcB(int value);
+    public static int calcAB(int a, int b);
+    public static Either<Failure, Integer> calc(int value);
+```
+Már a szignatúrából szépen látszik, hogy melyik függvény ad vissza hibát és melyik nem.
+
+Nézzük meg az implementációjukat:
+```java
+    public static Either<Failure, Integer> calc(int value) {
+        final int a = calcA(value);
+        return calcB(value)
+            .map(b -> calcAB(a, b));
+    }
+
+    public static int calcA(int value) {
+        return value * 5;
+    }
+
+    public static Either<Failure, Integer> calcB(int value) {
+        final int divisor = (20 - calcA(10 - value));
+        return divisor == 0 ?
+            Left.of(Failure.of("/ by zero")) :
+            Right.of(10000 / divisor);
+    }
+
+    public static int calcAB(int a, int b) {
+        return a + b;
+    }
+```
