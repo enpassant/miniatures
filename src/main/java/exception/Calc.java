@@ -27,12 +27,13 @@ public class Calc {
             System.out.println("Result1: " + e);
         }
 
+        int result2;
         try {
-            final int result2 = calc(8);
-            System.out.println("Result2: " + result2);
+            result2 = calc(8);
         } catch (Exception e) {
-            System.out.println("Result2: " + e);
+            result2 = 0;
         }
+        System.out.println("Result2: " + result2);
 
         int result3;
         try {
