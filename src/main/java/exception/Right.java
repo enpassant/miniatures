@@ -55,8 +55,8 @@ public final class Right<L, R> implements Either<L, R> {
     }
 
     @Override
-    public Either<L, R> orElse(R value) {
-        return this;
+    public R orElse(R value) {
+        return this.value;
     }
 
     @Override

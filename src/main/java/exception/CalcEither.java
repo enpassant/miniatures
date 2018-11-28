@@ -30,17 +30,17 @@ public class CalcEither {
         final Either<Failure, Integer> result1 = calc(6);
         System.out.println("Result1: " + result1);
 
-        final int result2 = calc(8).orElse(0).get();
+        final int result2 = calc(8).orElse(0);
         System.out.println("Result2: " + result2);
 
-        final int result3 = calc(6).orElse(0).get();
+        final int result3 = calc(6).orElse(0);
         System.out.println("Result3: " + result3);
 
         System.out.println("Result4: " +
             IntStream
                 .range(1, 20)
                 .mapToObj(CalcEither::calc)
-                .map(v ->v.orElse(0).get())
+                .map(v ->v.orElse(0))
                 .collect(Collectors.toList())
         );
 

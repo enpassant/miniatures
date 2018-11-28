@@ -12,7 +12,7 @@ public interface Either<L, R> {
     <B> Either<L, B> flatten();
     Either<L, R> forEach(Consumer<R> f);
     Either<L, R> forEachLeft(Consumer<L> f);
-    Either<L, R> orElse(R value);
+    R orElse(R value);
     Optional<L> left();
     Optional<R> right();
     R get();

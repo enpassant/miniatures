@@ -29,7 +29,7 @@ public interface Either<L, R> {
     <B> Either<L, B> flatMap(Function<R, Either<L, B>> f);
     Either<L, R> forEach(Consumer<R> f);
     Either<L, R> forEachLeft(Consumer<L> f);
-    Either<L, R> orElse(R value);
+    R orElse(R value);
 }
 ```
 
@@ -119,16 +119,16 @@ createPositive(15).forEachLeft(failure -> logger.debug("Failure: {}", failure));
 // Eredménye: Right(15) és nem írja a logot.
 ```
 
-#### ```Either<L, R> orElse(R value);```
+#### ```R orElse(R value);```
 
 Hibás érték esetén lecseréli a paraméterben megadott helyes értékre. Helyes érték esetén az eredeti Eithert adja vissza.
 
 Pl.:
 ```java
 createPositive(15).orElse(1);
-// Eredménye: Right(15)
+// Eredménye: 15
 createPositive(-5).orElse(1);
-// Eredménye: Right(1).
+// Eredménye: 1.
 ```
 
 ## Példák az összehasonlításhoz
@@ -259,7 +259,7 @@ Induljunk el ezzel:
     public static int calcAB(int a, int b);
 ```
 
-Ennyiből sajnos fogalmunk sincs, hogy dob-e valamelyik exceptiont. Ahhoz, hogy ezt megtudjuk végig kell nézzük a `calcA`, `calcB` és `calcAB` forrását és az azokból hívott összes metódus forrását, és így tovább.
+Ennyiből sajnos fogalmunk sincs, hogy dob-e valamelyik exceptiont. Ahhoz, hogy ezt megtudjuk végig kell nézzük a `calc`, `calcA`, `calcB` és `calcAB` forrását és az azokból hívott összes metódus forrását, és így tovább.
 
 Legyenek a következő egyszerű megvalósítások:
 ```java
@@ -340,3 +340,4 @@ Nézzük meg az implementációjukat:
         return a + b;
     }
 ```
+Egy kicsit bonyolultabbnak tűnik a kód, de ez abból adódik, hogy itt mindenhol kezdünk valamit a hibával, míg az exception-nél hagytuk tovább dobódni.
