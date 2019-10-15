@@ -2,7 +2,7 @@ name := """miniatures"""
 
 version := "1.0"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.8"
 
 scalacOptions ++= Seq("-Ypartial-unification", "-feature", "-deprecation")
 
@@ -30,8 +30,9 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-free" % "1.1.0",
   "org.typelevel" %% "cats-effect" % "1.0.0-RC",
   "com.github.enpassant" %% "ickenham" % "1.4.1",
-  "org.scalaz" %% "scalaz-zio" % "0.1.0-dc8b6a3",
-  "com.googlecode.json-simple" % "json-simple" % "1.1.1"
+  "org.scalaz" %% "scalaz-zio" % "1.0-RC4",
+  "com.googlecode.json-simple" % "json-simple" % "1.1.1",
+  "com.h2database" % "h2" % "1.4.197"
 )
 
 connectInput in run := true
