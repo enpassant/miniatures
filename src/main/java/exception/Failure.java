@@ -88,12 +88,13 @@ public class Failure {
 
     @Override
     public String toString() {
-        Optional<String> paramStrOpt = params.entrySet()
+        final Optional<String> paramStrOpt = params.entrySet()
             .stream()
             .map(entry -> entry.getKey() + " -> " + entry.getValue())
             .reduce((s1, s2) -> s1 + ", " + s2);
+        final String paramStr = paramStrOpt.map(p -> ", " + p).orElse("");
 
-        return "Failure(" + code + ", " + paramStrOpt + ")";
+        return "Failure(" + code + paramStr + ")";
     }
 
     public static <E extends Exception, R> R ignoreException(E e, R r) {
