@@ -6,7 +6,7 @@ import scala.util.Random
 import Common._
 
 object SimpleFP {
-  def runApp(implicit config: Config) = {
+  def runApp(config: Config) = {
     val webServer = new WebServer(config.host, config.port)
     val dbServer = new DBServer(config.dbUrl, config.dbUser, config.dbPassword)
     val smtpServer = new SmtpServer(
@@ -90,7 +90,7 @@ object SimpleFPApp extends App {
   println(ID("0123-4567-8901"))
   println(ID("122"))
 
-  implicit val config = Config(
+  val config = Config(
     "localhost",
     9000,
     "jdbc:..",
@@ -103,5 +103,5 @@ object SimpleFPApp extends App {
     true
   )
 
-  SimpleFP.runApp
+  SimpleFP.runApp(config)
 }
