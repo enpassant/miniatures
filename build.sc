@@ -28,7 +28,7 @@ object main extends SbtModule {
     ivy"org.typelevel::cats-free::1.1.0",
     ivy"org.typelevel::cats-effect::1.0.0-RC",
     ivy"com.github.enpassant::ickenham::1.4.1",
-    ivy"org.scalaz::scalaz-zio::0.1.0-dc8b6a3",
+    ivy"org.scalaz::scalaz-zio::1.0-RC4",
     ivy"com.googlecode.json-simple:json-simple::1.1.1"
   )
 
