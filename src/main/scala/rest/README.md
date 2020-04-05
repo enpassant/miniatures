@@ -104,13 +104,11 @@ Az OOP világban is a viselkedéseket (igéket) sok esetben főnevesítik, hogy 
 A mai modern OOP-k, illetve az FP programok már a kezdetektől, adatként tekintenek a viselkedésre (függvény, metódus).
 Szóval egy viselkedés, cselekvés, parancs az szintén adat, így lehet erőforrás.
 
-Mutatok rá két példát!
+Nézzünk rá egy példát!
 
-1. **/api/login** Bejelentkezés erőforrás. *PUT*-tal (vagy *POST*-tal, de erről később) elküldhetjük a bejelentkezési adatokat, majd válaszként kapunk egy tokent, amivel azonosítani tudjuk magunkat.
-Bejelentkezés előtt, ha *GET*-tel elkérjük a bejelentkezés erőforrást, akkor 404-es Not Found üzenetet kapunk.
-Ha bejelentkezés után kérjük el, akkor visszakapjuk a bejelentkezés adatait, pl. ki, mikor, melyik gépről, ..., azon adatokat, amiket a bejelentkezett számára publikusnak gondolunk.
-
-2. **/api/orders/3f2418ca/pay** A *3f2418ca* azonosítójú rendelés kifizetési erőforrása. Ide elküldhetjük a rendelés kifizetésére vonatkozó információkat, ki, mikor, mivel, ... fizette ki.
+**/api/orders/3f2418ca/pay** A *3f2418ca* azonosítójú rendelés kifizetési erőforrása. Ide *PUT*-tal (vagy *POST*-tal, de erről később) elküldhetjük a rendelés kifizetésére vonatkozó információkat, ki, mikor, mivel, ... fizette ki.
+Kifizetés előtt, ha *GET*-tel elkérjük a kifizetési erőforrást, akkor 404-es Not Found üzenetet kapunk.
+Ha kifizetés után kérjük el, akkor visszakapjuk a rendelés kifizetésére vonatkozó információkat.
 
 Akkor ez nem REST, hanem RPC!
 
