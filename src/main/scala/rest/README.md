@@ -144,9 +144,9 @@ Tehát amelyik rendszer ezt nem teljesíti az nem is RESTful!
 
 - Ha így csináljuk, akkor a kliens és a szerver valóban egymástól külön fejleszthető.
 Amint beteszünk a szerverbe új funkciókat, kiveszünk régieket, módosítjuk az erőforrások azonosítóit, ..., a kliens módosítása nélkül azonnal használhatóvá válik.
-- Nem fok gondot okozni a verziókezelés sem.
+- Nem fog gondot okozni a verziókezelés sem.
 Ha egy új verziót nem ismer valamelyik kliens, akkor sincs semmi gond, működik a régivel, a régi funkcionalitással.
-Amint az a kliens is ismeri az új verziót azon nyomban használni is tudja.
+Amint az a kliens is ismeri az új verziót, azon nyomban használni is tudja.
 Ez fordítva is igaz, a kliens már ismeri az új verziót, de nem fog a szervertől hipermédia hivatkozásokat kapni az új verzióra, amíg a szerverbe azt bele nem fejlesztik.
 Magyarán teljesen mindegy, hogy az új verzió kezelése előbb kerül be a kliensekbe vagy előbb a szerverbe, de semmiképpen sem kell, hogy ez egyszerre történjen!
 - Könnyen skálázhatunk is a segítségével. Bizonyos erőforrásokat áttehetünk prémium szerverekre (változik az URI-ja), hogy a prémium ügyfeleknek jobb élményt nyújtsunk, anélkül, hogy a kliens programokon változtatni kellene.
@@ -160,7 +160,7 @@ Ha a kliens nem ismeri az erőforrás azonosítók felépítését, akkor honnan
 - Minimum kell ismernie a REST rendszerünk **belépési pont**ját, pl. **/api**
 - Ha el tud érni egy erőforrást (pl. a belépési pontot), akkor az erőforrás használatával (*GET*, *POST*, ...), vagy csak az opciók (*HEAD*) lekérdezésével, visszakapja az adott erőforrással **rel**ációban lévő hipermédia hivatkozásokat, illetve minden hivatkozáshoz az erőforrás média típusát.
 Pl. Ha a fenti **/api/orders/3f2418ca** erőforrást használjuk, akkor a válaszban kaphatunk egy ilyen hivatkozást, Link: <https://.../api/orders/3f2418ca/pay>; rel="pay"; type="payment/card".
-A *pay* relációból tudja, hogy azon URI adja meg a fizetés erőforrását, a *type*-ból pedig tudja, hogy kártyás fizetés típusú objektumot kell átadjon.
+A *pay* relációból tudja, hogy azon URI adja meg a fizetés erőforrását, a *type*-ból pedig tudja, hogy kártyás fizetés típusú objektumot kell átadjon. Ha ismeri a *pay* relációt és ismeri *"payment/card"* média típust is, akkor el tudja végeztetni a rendelés kifizetését, pl. a felhasználó számára meg tudja jeleníteni a fizetési adatokat, majd kitöltésük esetén elküldi a megadott URI-ra.
 
 ## Egyéb gondolatok
 
