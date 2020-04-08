@@ -96,23 +96,16 @@ Itt is sok a félreértés.
 Bármi lehet erőforrás!
 Semmilyen kitétel nincs rá.
 Lehet objektum, adat, szolgáltatás, de akár lehet parancs is, bármi.
+Összefoglalóan, erőforrás tetszőleges koncepció (fogalom) lehet, amit el tudunk nevezni.
 
-- Parancs is lehet erőforrás?
-Ez hülyeség! Csak olyan lehet erőforrás, ami főnév.
-- Nem, nem az.
-Az OOP világban is a viselkedéseket (igéket) sok esetben főnevesítik, hogy adatként lehessen használni azokat, pl. ProcessManager vagy Processor.
-A mai modern OOP-k, illetve az FP programok már a kezdetektől, adatként tekintenek a viselkedésre (függvény, metódus).
-Szóval egy viselkedés, cselekvés, parancs az szintén adat, így lehet erőforrás.
-
-Nézzünk rá egy példát!
-
-**/api/orders/3f2418ca/pay** A *3f2418ca* azonosítójú rendelés kifizetési erőforrása. Ide *PUT*-tal (vagy *POST*-tal, de erről később) elküldhetjük a rendelés kifizetésére vonatkozó információkat, ki, mikor, mivel, ... fizette ki.
-Kifizetés előtt, ha *GET*-tel elkérjük a kifizetési erőforrást, akkor 404-es Not Found üzenetet kapunk.
-Ha kifizetés után kérjük el, akkor visszakapjuk a rendelés kifizetésére vonatkozó információkat.
+Eljárások is lehetnek erőforrások? Igen, azokat is el tudjuk nevezni.
 
 Akkor ez nem REST, hanem RPC!
 
-Nem, ez REST, mindenben megfelel a REST definícióinak, megszorításainak, erőforrásként tekintünk rá, van azonosítója, azon keresztül elérhetjük, módosíthatjuk, törölhetjük.
+Igen ez RPC, de egyben REST is, ha mindenben megfelel a REST definícióinak, megszorításainak, erőforrásként tekintünk rá, van azonosítója, azon keresztül elérhetjük és/vagy módosíthatjuk és/vagy törölhetjük.
+Ez azt jelenti, hogy készíthetünk olyan REST alkalmazást, aminek egy része vagy az egész RPC is. Másként fogalmazva az RPC-nek és a REST-nek van közös metszete.
+
+Erre még később visszatérünk.
 
 #### Erőforrások manipulációja ezeken a reprezentációkon keresztül
 
@@ -132,7 +125,7 @@ Nézzük újra meg a definícióját!
 Ez az egyik legfontosabb pont, ennek ellenére egyik kitételét sem szokták betartani.
 
 - Eleve a szerver nem szokta elküldeni a hipermédia hivatkozásokat.
-- Ha van, amit el is küld, akkor sem csak azokon az állapotokon mehet át, hanem olyanokon is, amiket nem küldött el.
+- Ha van, amit el is küld, a kliens akkor sem csak azokon az állapotokon mehet át, hanem olyanokon is, amiket nem küldött el a szerver.
 - Végül, nem csak pár egyszerű belépési pontot feltételez a kliens, hanem a korábban látott, az összes erőforrásra meghatározott útvonal felsorolást.
 
 Ez egy szükséges pont, nem opcionális.
@@ -151,12 +144,20 @@ Magyarán teljesen mindegy, hogy az új verzió kezelése előbb kerül be a kli
 - Nagyon sok hiba származik abból, hogy a kliens rossz útvonalon próbálkozik. Pl. kimarad egy útvonal részlet, rossz a sorrendjük, vagy elmarad egy URL enkodolás.
 - Csökkenthető az érvénytelen állapot átmenetek száma. Pl. a korábban említett **/api/orders/3f2418ca/pay** hivatkozást csak akkor küldi a szerver, ha még nem volt az adott rendelés kifizetve. Így elkerülhető, hogy még egyszer megpróbálja a kliens kifizetni, ha már ki volt fizetve.
 
-##### Mit tudjon a kliens?
+##### Mit ismerjen a kliens?
 
 Ha a kliens nem ismeri az erőforrás azonosítók felépítését, akkor honnan tudja, hogy miket kérdezhet le és hogyan módosítsa az erőforrást?
 
-- Minimum kell ismernie a REST rendszerünk **belépési pont**ját, pl. **/api**
-- Ha el tud érni egy erőforrást (pl. a belépési pontot), akkor az erőforrás használatával (*GET*, *POST*, ...), vagy csak az opciók (*HEAD*) lekérdezésével, visszakapja az adott erőforrással **rel**ációban lévő hipermédia hivatkozásokat, illetve minden hivatkozáshoz az erőforrás média típusát.
+- Minimum kell ismernie a REST rendszerünk **belépési pont**ját (1), pl. **/api**
+- Ha el tud érni egy erőforrást (pl. a belépési pontot), akkor az erőforrás használatával (*GET*, *POST*, ...), vagy csak az opciók (*HEAD*) lekérdezésével, visszakapja az adott erőforrással **rel**ációban (2) lévő hipermédia hivatkozásokat, illetve minden hivatkozáshoz az **erőforrás média típusát** (3).
+
+Tehát a kliensnek ezeket és csak ezeket kell ismernie:
+1. Alkalmazás beépési pontját.
+2. Az egyes erőforrás reprezentációk **rel**ációját más erőforrásokhoz.
+3. Egyes **erőforrások média típusának** tartalmát.
+
+Nem szükséges minden relációt és médiatípust ismernie, amiket ismer, azokat tudja használni, a többi olyan, mintha nem is lenne a kliens számára.
+
 Pl. Ha a fenti **/api/orders/3f2418ca** erőforrást használjuk, akkor a válaszban kaphatunk egy ilyen hivatkozást, Link: <https://.../api/orders/3f2418ca/pay>; rel="pay"; type="payment/card".
 A *pay* relációból tudja, hogy azon URI adja meg a fizetés erőforrását, a *type*-ból pedig tudja, hogy kártyás fizetés típusú objektumot kell átadjon. Ha ismeri a *pay* relációt és ismeri *"payment/card"* média típust is, akkor el tudja végeztetni a rendelés kifizetését, pl. a felhasználó számára meg tudja jeleníteni a fizetési adatokat, majd kitöltésük esetén elküldi a megadott URI-ra.
 
@@ -185,11 +186,45 @@ Természetesen az új mellett ideiglenesen meghagyhatjuk a régi típust is, íg
 
 Itt is ölre menő viták szoktak lenni, hogy mikor melyiket használjuk.
 
-Egyik probléma az, hogy melyiket használjuk, ha nem felvétel, módosítás, törlés műveletről van szó, hanem pl. egy kifizetésnél.
-Mint korábban láttuk, ennél a megvalósításnál ezzel nincs gond, mert a fizetés is erőforrás.
-
 #### Melyik HTTP metódusokat célszerű használni?
 
+Elsősorban a biztonságos metódusokat célszerű, mivel azok nem változtatják meg a szerver állapotát.
+
+Ha meg kell változtassuk a szerver állapotát, akkor célszerű idempotens metódusokat használni.
+Az idempotens azt jelenti, hogy ha egyszer küldjük el az üzenetet a szervernek, akkor is ugyanaz lesz a szerver állapota, mint amikor többször egymás után küldjük el ugyanazt az üzenetet.
+
+Miért jobb az idempotens művelet?
+
+Nézzük ezt meg a POST (nem idempotens) és a PUT (idempotens) példáján!
+
+Vegyünk fel egy új rendelést!
+
+- **POST** /api/orders/, ami létrehoz egy rendelést, visszakapjuk, hogy a 4-es számú rendelést hozta létre.
+- **PUT** /api/orders/4, ez szintén a 4-es számú rendelést hozza létre vagy, ha már létezik, akkor felülírja.
+
+Elsőre a **PUT** tűnik veszélyesebbnek.
+Felülírja, ha már létezik?
+Könnyen lehet, hogy egy másik kliens is épp akkor veszi fel a 4-es rendelést, ekkor előfordulhat, hogy az egyik kliens felülírja a másikét.
+Ez így van, ez egy fontos probléma.
+
+Szerencsére ezt könnyen orvosolhatjuk!
+
+1. Egy metaadattal jelezhetjük, hogy új felvételét akarjuk csak megengedni, pl. **PUT** /api/orders/4?new=true
+Ebben az esetben ez első üzenet feldolgozásakor felveszi 4-es azonosítóval az új rendelést, majd a következő kliens üzeneténél látja, hogy már van ilyen és visszautasítja a felvételt.
+Ez annyiból jó megoldás, hogy elkerültük a felülírást, de nem engedjük mindkét kliensnek a felvételt, rossz esetben kezdheti újra a visszautasított kliens.
+2. Azonosításra használhatunk UUID-t (némely esetben HASH-t), ami garantálja, hogy egyedi lesz az azonosító.
+A mi rendszerünkben mindenképp egyedi lesz, ha UUID 1 v. 2 eljárást alkalmazunk, de az egész világon is elég nagy valószínűséggel. Emlékezzünk, hogy REST rendszerben, a hivatkozásokat a szervertől kapja a kliens, így ezt a hivatkozást is, amivel újat tud felvenni, tehát a kliensnek nem kell (és nem is tud) törődni az UUID generálással.
+
+A nagyobb biztonság kedvéért a két megoldást kombinálhatjuk is.
+
+A másik probléma az, ha az üzenetre nem érkezik válasz, (pl. timeout, megszakad a kapcsolat).
+Ilyenkor a kliens nem tudja, hogy a szerver feldolgozta-e az üzenetet, jelen esetben, hogy felvette-e a rendelést. **POST** esetén az is, hogy ha fel is vette, akkor mi lett az azonosítója.
+
+Idempotens műveleteknél (**PUT**) nincs ilyenkor nagy gond, mert újra elküldjük az üzenetet, amíg nem kapunk rá választ. Mivel idempotens, ezért ugyanaz a hatása az egyszeri küldésnek és a többszörinek is.
+
+Nem idempotens műveleteknél (**POST**) viszont bajban vagyunk. Ha nem küldjük újra, akkor lehet, hogy egyet sem vett fel. Ha újra küldjük, akkor lehet, hogy többet is felvesz. Erre a problémára viszont nem igazán van megoldás.
+
+A fentiek alapján én ezeket a metódusokat ajánlom használni:
 - **GET**. Erőforrás lekérdezésére. Biztonságos, cache-elhető és idempotens.
 - **PUT**. Erőforrás felvételére és módosítására. Idempotens.
 - **DELETE**. Erőforrás törlésére. Idempotens.
@@ -197,15 +232,71 @@ Mint korábban láttuk, ennél a megvalósításnál ezzel nincs gond, mert a fi
 
 Én a többi metódust nem javaslom használni, a többi nem idempotens és kiváltható a fentiekkel.
 
-Sokan nem tudják, de a **PUT** felvételre is alkalmas, de míg a **POST** esetén nem kell megadni a felvenni kívánt erőforrás azonosítóját, addig a **PUT**-nál meg kell.
-Pl. **PUT** /api/orders/4 vs. **POST** /api/orders/, ami létrehozza a 4-es számú rendelést.
+#### Távoli eljárás hívás (RPC)
+
+Nagy probléma az is, hogy melyik HTTP metódust használjuk, ha nem felvétel, módosítás, törlés műveletről van szó, hanem tetszőleges más eljárásról.
+
+Vegyünk egy példa eljárást:
+```
+    launchMissile(date, target)
+```
+
+Ehhez felvehetünk egy `/api/procedures/launchMissile` erőforrást, ami pl. `application/json+LaunchMissileParameter` médiatípust tud fogadni.
+Összeállítja a kliens a megfelelő jsont (date és target mezőkkel), majd azt elküldi **POST**-tal a fenti URI-ra.
+
+Habár ez is REST, de a szellemiségével azért nem teljesen egyezik, így csak szükséges esetben használjuk!
+
+#### Távoli függvény hívás
+
+Hasonló, mint az RPC, de itt egy létező erőforráson szeretnénk valamilyen függvényt végezni, vagy olyan függvényt alkalmazni, aminek az eredménye egy erőforrás lesz.
+Azért nem eljárásnak hívom, hanem függvénynek, mert van bemenete és van kimenete is.
+
+Ennek megvalósítására több lehetőségünk is van:
+1. A módosítandó erőforrás gyereke lesz a végrehajtandó függvény erőforrás, a body részben pedig a függvény paraméterezése megy át.
+Pl. `/api/orders/3f2418ca/pay` lesz a gyerek erőforrás, az üzenet törzsben pedig a paraméterek mennek át az annak megfelelő médiatípus formában (pl. `PaymentParameters`).
+2. A módosítandó erőforrás címére küldjük a végrehajtandó függvény médiatípust (pl. `Payment`).
+3. A létrejövő erőforrás címére küldjük a végrehajtandó függvény médiatípust (pl. `Payment`).
 
 ### Visszatérési érték
 
 Itt is sok szokott lenni a kérdőjel.
 Itt nincs határozott álláspontom.
-Szerintem két megoldás is elfogadható, de én inkább a másodikat javaslom:
+Szerintem két megoldás is elfogadható, de én inkább az elsőt javaslom:
 - Minden esetben használjuk a HTTP visszatérési kódokat (200, 404, ...).
 - A http protokollra vonatkozó visszatérési értékek esetén használjuk azokat, az alkalmazásra vonatkozó problémák esetén pedig magában a visszaadott erőforrásban adjuk meg.
 Ennek az az egyik előnye, hogy ha más protokollra állnánk át, akkor az könnyen menne; a másik az, hogy elkülönül az alkalmazás hiba a protokoll hibáktól, így könnyebb a szerver alkalmazásban is ezt kezelni.
 
+### Számlakezelési feladat példa
+
+A következő tevékenységeket kell tudnia:
+- számla felvétele,
+- számla adatainak lekérése,
+- számla törlése,
+- számla elnevezés módosítása,
+- utalás számlára,
+- összeg levonása.
+
+Ezt a következő API-val lehet leírni:
+
+Belépési pont (_root_): /api
+
+Átmenetek:
+
+| Context       | rel      | metódus | Content-Type médiatípus | Accept médiatípus |
+|---------------|----------|---------|-------------------------|-------------------|
+| _root_        | accounts | GET     |                         | List[Account]     |
+| List[Account] | new      | PUT     | Account                 | Account           |
+| List[Account] | item     | GET     |                         | Account           |
+| Account       | delete   | DELETE  |                         | Account           |
+| Account       | edit     | PUT     | Name                    | Account           |
+| Account       | edit     | PUT     | Deposit                 | Account           |
+| Account       | edit     | PUT     | Withdraw                | Account           |
+
+Médiatípusok:
+- Account(name: Name, number: AccountNumber, balance: Double)
+- Name(value: String[80])
+- Deposit(sourceAccount: AccountNumber, amount: Double)
+- Withdraw(targetAccount: AccountNumber, amount: Double)
+
+Egyéb adattípus:
+- AccountNumber: [0-9]{16,24}
