@@ -8,7 +8,7 @@ Az már kevésbé ismert, hogy a függvényeket két nagy csoportba sorolhatjuk,
 A [függvényekről a wikipédián](https://hu.wikipedia.org/wiki/F%C3%BCggv%C3%A9ny_(matematika)) sok mindent megtudhatunk, de minket most csak a parciális és totális függvények definíciója érdekel.
 
 A programozás kapcsán mi a következő definíciókat fogjuk használni:
-- **függvény**: olyan leképezés, amely minden inputhoz legfeljebb egy outputot rendel.
+- **függvény**: olyan leképezés, amely input érték(ek)hez output érték(ek)et rendel.
 - **totális függvény**: olyan leképezés, amely minden inputhoz pontosan egy outputot rendel.
 - **parciális függvény**: olyan függvény, ami nem totális. Másképp, van legalább egy input, amihez nincs output meghatározva.
 
