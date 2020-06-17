@@ -27,7 +27,7 @@ object WebServer extends App {
   handlers.setHandlers(
     Array(new ShutdownHandler("password", false, true), JettyHandler))
 
-  val serverJetty = new Server(8080)
+  val serverJetty = new Server(8001)
   serverJetty.setHandler(handlers)
   serverJetty.start();
   serverJetty.join();
