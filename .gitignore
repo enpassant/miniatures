@@ -7,3 +7,5 @@
 /out/
 .metals/
 .bloop/
+.bsp/
+.scalafmt.conf
