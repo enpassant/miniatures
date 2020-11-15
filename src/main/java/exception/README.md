@@ -133,31 +133,6 @@ createPositive(-5).orElse(1);
 
 ## Példák az összehasonlításhoz
 
-### Either
-
-```java
-Either<Failure, DatabaseConfig> databaseConfigResult =
-    DatabaseConfig.load("conf/" + configFileName);
-
-Either<Failure, Repository> repositoryResult =
-    databaseConfigResult.flatMap(
-        databaseConfig -> Repository.load(
-            databaseConfig.driver,
-            databaseConfig.connectionUrl));
-
-repositoryResult.flatMap(repository ->
-    CommunicationConfig.loadFromDB(repository).map(
-        communicationConfig ->
-            Main.run(repository, communicationConfig))
-).forEachLeft(failure -> logger.error("Hiba: {}", failure));
-```
-
-1. Betölti az adatbázis configot.
-2. Az adatbázis config alapján betölti (létrehozza) a repositoryt. (Kapcsolódik adatbázishoz, példa lekérdezést végez, hogy minden rendben)
-3. A repository alapján betölti adatbázisból a kommunikációs config-ot.
-4. A repository és a kommunikációs config alapján futtatja a programot.
-5. Ha a fenti pontok bármelyikénél hiba volt, akkor kiírja a hibát és leáll a program.
-
 ### try-catch
 
 ```java
@@ -174,10 +149,35 @@ try {
 }
 ```
 
+1. Betölti az adatbázis configot.
+2. Az adatbázis config alapján betölti (létrehozza) a repositoryt. (Kapcsolódik adatbázishoz, példa lekérdezést végez, hogy minden rendben)
+3. A repository alapján betölti adatbázisból a kommunikációs config-ot.
+4. A repository és a kommunikációs config alapján futtatja a programot.
+5. Ha a fenti pontok bármelyikénél hiba volt, akkor kiírja a hibát és leáll a program.
+
+### Either
+
+```java
+Either<Failure, DatabaseConfig> databaseConfigResult =
+    DatabaseConfig.load("conf/" + configFileName);
+
+Either<Failure, Repository> repositoryResult = databaseConfigResult.flatMap(databaseConfig ->
+    Repository.load(databaseConfig.driver, databaseConfig.connectionUrl));
+
+Either<Failure, Repository> communicationConfigResult = repositoryResult.flatMap(repository ->
+    CommunicationConfig.loadFromDB(repository);
+
+communicationConfigResult.map(communicationConfig ->
+    Main.run(repository, communicationConfig))
+).forEachLeft(failure ->
+digitlogger.error("Hiba: {}", failure)
+);
+```
+
 ## A látszat csal!
 
 Ha megnézzük a két példát, akkor a try-catch verzió egyszerűbbnek, könnyebben olvashatónak tűnik.
-Az Either-est látszólag elbonyolítják a lambdák, map-ek, flatMap-ek és a forEachLeft.
+Az Either-est látszólag elbonyolítják a lambdák, a flatMap-ek, a map és a forEachLeft.
 
 Az egyszerű és a könnyen olvasható definíciójától függ, hogy ez tényleg így is van-e.
 Ha úgy definiáljuk ezeket, hogy ami kinézetre egyszerűbb, könnyebben olvasható, mert sokszor találkozom vele és ismerős a felépítése, akkor tényleg a try-catch az egyszerűbb.
@@ -220,7 +220,8 @@ Ha módosítani, refaktorálni akarom az adott kódot, akkor minden egyes sorná
 
 ### _"Az ezer GoTo általi halál"_
 
-Egy exception dobás tulajdonképpen ugyanaz, mintha egy goto utasítást hajtanánk végre. Ami kicsit még rosszabbá teszi, hogy pontosan nincs is meghatározva, hogy hová fog ugrani, ráadásul több helyre is ugorhat.
+Egy exception dobás tulajdonképpen ugyanaz, mintha egy goto utasítást hajtanánk végre.
+Ami kicsit még rosszabbá teszi, hogy pontosan nincs is meghatározva, hogy hová fog ugrani, ráadásul több helyre is ugorhat.
 
 Azt a függvényt, ahol dobjuk az exceptiont, több másik függvényből is hívhatjuk, azokat szintén, és így tovább. Nagyon bonyolult hívási gráfunk lehet, amelynek minden egyes ágán elkaphatjuk a dobott exceptiont. Ha megvan a hívási gráfunk és minden egyes lehetőséget végignéznénk, akkor még az is megnehezíti a dolgunkat, hogy nem feltétlen az adott exceptiont kapjuk el, hanem egy ősét. Tehát még az is egy nehezítő tényező, hogy tudnunk kell az exceptionök leszármazási hierarchiáját.
 
