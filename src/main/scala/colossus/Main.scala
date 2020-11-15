@@ -1,5 +1,6 @@
 package colossus
-
+// Remove because Colossus is not actively developed.
+/*
 import colossus.core._
 import colossus.core.server.Server
 import colossus.controller._
@@ -234,3 +235,4 @@ object Main extends App {
         }
 }  }}
 }
+*/
