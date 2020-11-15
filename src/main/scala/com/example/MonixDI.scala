@@ -243,7 +243,7 @@ object MonixDI extends App {
     { case LineRead(name) => makeEffect(PrintLine(s"Hello $name!")) })
 
   val list = Task.gather(tasks.toSeq)
-  list.runAsync.foreach(println)
+  list.runAsync(println)
 
   (messageBusOut.scan(0) { case (a, b) => a + 1 }).bufferTumbling(5).subscribe {
     msg => println(msg); Ack.Continue

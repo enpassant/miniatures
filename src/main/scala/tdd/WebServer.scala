@@ -5,9 +5,9 @@ import java.net.InetSocketAddress
 
 import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
-import javax.servlet.ServletException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.servlet.ServletException
 
 import java.io.IOException
 
@@ -51,7 +51,7 @@ object WebServer extends App {
       target: String,
       baseRequest: Request,
       request: HttpServletRequest,
-      resp: HttpServletResponse)
+      resp: HttpServletResponse): Unit =
     {
       val result = request match {
         case GetCommandJetty("orders", id, "CalcSumPrice") =>

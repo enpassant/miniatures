@@ -1,7 +1,7 @@
 package zio
 
-import scalaz.zio.{App, IO}
-import scalaz.zio.console._
+import zio.{App, ExitCode, IO}
+import zio.console._
 
 import java.io.IOException
 
@@ -13,7 +13,7 @@ object Fibonacci extends App {
   case class AppException(exception: Exception) extends AppError
 
   def run(args: List[String]) =
-    myAppLogic.fold(_ => 1, _ => 0)
+    myAppLogic.fold(_ => ExitCode(1), _ => ExitCode(0))
 
   def myAppLogic =
     for {

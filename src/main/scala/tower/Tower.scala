@@ -1,6 +1,7 @@
 package tower
 
 import scala.collection.immutable.TreeSet
+import scala.collection.parallel.CollectionConverters._
 import scala.util.Random
 
 case class Slice(wall: Int = 0, water: Int = 0, air: Int = 0) {

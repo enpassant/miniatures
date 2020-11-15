@@ -42,5 +42,5 @@ object Directives {
     }
 
     def respondWithLinks(links: LinkValue*) =
-      respondWithHeader(Link(links : _*))
+      respondWithHeader(Link(links))
 }

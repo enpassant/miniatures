@@ -2,11 +2,11 @@ name := """miniatures"""
 
 version := "1.0"
 
-scalaVersion := "2.12.8"
-//scalaVersion := "2.13.3"
+//scalaVersion := "2.12.8"
+scalaVersion := "2.13.3"
 //scalaVersion := "0.26"
 
-scalacOptions ++= Seq("-Ypartial-unification", "-feature", "-deprecation")
+scalacOptions ++= Seq("-feature", "-deprecation")
 
 javaOptions += "-Xmx4512m"
 
@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.2" % "test",
   "com.storm-enroute" %% "scalameter" % "0.19",
   "com.chuusai" %% "shapeless" % "2.3.3",
-  "com.tumblr" %% "colossus" % "0.11.0",
+  //"com.tumblr" %% "colossus" % "0.11.0",
   "org.json4s"             %% "json4s-jackson"        % "3.6.10",
   "com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
   "com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
@@ -28,13 +28,15 @@ libraryDependencies ++= Seq(
   "io.monix"               %% "monix"                 % "3.3.0",
   "org.eclipse.jetty" % "jetty-server" % "11.0.0.beta3",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "org.typelevel" %% "cats-core" % "2.2.0",
-  "org.typelevel" %% "cats-free" % "2.2.0",
-  "org.typelevel" %% "cats-effect" % "3.0.0-f471c52",
-  "com.github.enpassant" %% "ickenham" % "1.4.1",
-  "org.scalaz" %% "scalaz-zio" % "1.0-RC4",
+  "org.typelevel" %% "cats-core" % "2.3.0-M2",
+  "org.typelevel" %% "cats-free" % "2.3.0-M2",
+  "org.typelevel" %% "cats-effect" % "2.3.0-M1",
+  "com.github.enpassant" %% "ickenham" % "1.5.0",
+  "dev.zio" %% "zio" % "1.0.3",
   "com.googlecode.json-simple" % "json-simple" % "1.1.1",
-  "com.h2database" % "h2" % "1.4.200"
+  "com.h2database" % "h2" % "1.4.200",
+  "org.scala-lang.modules" %% "scala-parallel-collections" % "0.2.0",
+  "jakarta.servlet" % "jakarta.servlet-api" % "5.0.0" % "provided",
 )
 
 connectInput in run := true
