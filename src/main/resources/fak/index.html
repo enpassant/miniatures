@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title data-ng-bind="pageTitle"></title>
+    <link rel="stylesheet" media="screen" href="css/main.css">
+    <script src="js/main.js" type="text/javascript"></script>
+    <script src="js/FileSaver.js" type="text/javascript"></script>
+  </head>
+  <body>
+      <p>
+          <a class="button" id="command" href="#">+</a>
+          <a class="button" id="addColumn" href="#">Add column</a>
+          <a class="button" id="addRow" href="#">Add Row</a>
+          <a class="button" id="generateCsv" href="#">CSV</a>
+      </p>
+      <table id="table">
+          <thead>
+              <tr>
+                  <th>#</th>
+                  <th contenteditable="true">Type</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>1.</td>
+                  <td class="counter">0</td>
+              </tr>
+          </tbody>
+      </table>
+    <div></div>
+  </body>
+</html>
+
