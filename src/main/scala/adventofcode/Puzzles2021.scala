@@ -15,16 +15,12 @@ object Puzzles2021 extends App {
           .map(Integer.parseInt(_) )
         )
       .toSeq
-      .flatMap(a => vectorToPixels(a(0), a(1), a(2), a(3)))
+      .map(a => (a(0), a(1), a(2), a(3)))
+      .collect(vectorToPixels)
+      .flatten
       .groupMapReduce(identity)(_ => 1)(_ + _)
       .filter { case (k, v) => v > 1 }
       .size
-  }
-
-  def vectorToPixelsNothing:
-    PartialFunction[(Int, Int, Int, Int), Seq[(Int, Int)]] =
-  {
-    case (x1, y1, x2, y2) => Seq()
   }
 
   def vectorToPixelsHorizontal:
@@ -70,12 +66,11 @@ object Puzzles2021 extends App {
   }
 
   println(
-    //p2021_5(
-      //"input_5.txt",
-      //vectorToPixelsHorizontal orElse
-      //vectorToPixelsVertical orElse
-      //vectorToPixelsNothing
-    //)
+    p2021_5(
+      "input_5.txt",
+      vectorToPixelsHorizontal orElse
+      vectorToPixelsVertical 
+    ) + ", " +
     p2021_5(
       "input_5.txt",
       vectorToPixelsHorizontal orElse
