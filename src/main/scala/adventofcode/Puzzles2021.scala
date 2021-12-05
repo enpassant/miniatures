@@ -5,14 +5,14 @@ import scala.io.Source
 object Puzzles2021 extends App {
   def p2021_5(
     input: String,
-    vectorToPixels: PartialFunction[(Int, Int, Int, Int), Seq[(Int, Int)]]
+    filter: (Int, Int, Int, Int) => Boolean
   ) = {
     Source.fromFile(input)
       .getLines
       .toSeq
       .map(parseLine)
-      .collect(vectorToPixels)
-      .flatten
+      .filter(filter.tupled)
+      .flatMap(vectorToPixels.tupled)
       .groupMapReduce(identity)(_ => 1)(_ + _)
       .filter { case (k, v) => v > 1 }
       .size
@@ -32,38 +32,22 @@ object Puzzles2021 extends App {
         (x1 to x2 by -1)
       }
 
-  def vectorToPixelsHorizontal:
-    PartialFunction[(Int, Int, Int, Int), Seq[(Int, Int)]] =
-  {
-    case (x1, y1, x2, y2) if (x1 == x2)  =>
-      Seq(x1).zipAll(range(y1, y2), x1, -1)
-  }
+  def every(x1: Int, y1: Int, x2: Int, y2:Int) = true
 
-  def vectorToPixelsVertical:
-    PartialFunction[(Int, Int, Int, Int), Seq[(Int, Int)]] =
-  {
-    case (x1, y1, x2, y2) if (y1 == y2) =>
-      range(x1, x2).zipAll(Seq(y1), -1, y1)
-  }
+  def isNotDiagonal(x1: Int, y1: Int, x2: Int, y2:Int) =
+    (x1 == x2) || (y1 == y2)
 
-  def vectorToPixelsDiagonal:
-    PartialFunction[(Int, Int, Int, Int), Seq[(Int, Int)]] =
-  {
-    case (x1, y1, x2, y2) =>
-      range(x1, x2).zip(range(y1, y2))
-  }
+  val vectorToPixels = (x1: Int, y1: Int, x2: Int, y2:Int) =>
+      range(x1, x2).zipAll(range(y1, y2), x1, y1)
 
   println(
     p2021_5(
       "input_5.txt",
-      vectorToPixelsHorizontal orElse
-      vectorToPixelsVertical
+      isNotDiagonal
     ) + ", " +
     p2021_5(
       "input_5.txt",
-      vectorToPixelsHorizontal orElse
-      vectorToPixelsVertical orElse
-      vectorToPixelsDiagonal
+      every
     )
   )
 }
