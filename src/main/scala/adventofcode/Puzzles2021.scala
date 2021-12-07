@@ -3,7 +3,7 @@ package adventofcode
 import scala.io.Source
 
 object Puzzles2021 extends App {
-  val day = 6;
+  val day = 7;
 
   def p2021_5(
     input: String,
@@ -78,6 +78,50 @@ object Puzzles2021 extends App {
       )
     val round2 = p2021_6_2(
         "5,1,2,1,5,3,1,1,1,1,1,2,5,4,1,1,1,1,2,1,2,1,1,1,1,1,2,1,5,1,1,1,3,1,1,1,3,1,1,3,1,1,4,3,1,1,4,1,1,1,1,2,1,1,1,5,1,1,5,1,1,1,4,4,2,5,1,1,5,1,1,2,2,1,2,1,1,5,3,1,2,1,1,3,1,4,3,3,1,1,3,1,5,1,1,3,1,1,4,4,1,1,1,5,1,1,1,4,4,1,3,1,4,1,1,4,5,1,1,1,4,3,1,4,1,1,4,4,3,5,1,2,2,1,2,2,1,1,1,2,1,1,1,4,1,1,3,1,1,2,1,4,1,1,1,1,1,1,1,1,2,2,1,1,5,5,1,1,1,5,1,1,1,1,5,1,3,2,1,1,5,2,3,1,2,2,2,5,1,1,3,1,1,1,5,1,4,1,1,1,3,2,1,3,3,1,3,1,1,1,1,1,1,1,2,3,1,5,1,4,1,3,5,1,1,1,2,2,1,1,1,1,5,4,1,1,3,1,2,4,2,1,1,3,5,1,1,1,3,1,1,1,5,1,1,1,1,1,3,1,1,1,4,1,1,1,1,2,2,1,1,1,1,5,3,1,2,3,4,1,1,5,1,2,4,2,1,1,1,2,1,1,1,1,1,1,1,4,1,5"
+      )
+    println(s"$round1, $round2")
+  }
+
+  def p2021_7(
+    input: String,
+    calcFn: (Seq[Int], Int) => Int
+  ) = {
+    val population = Source.fromFile(input)
+        .mkString
+        .split(",")
+        .map(_.trim.toInt)
+
+    val startSum = calcFn(population, 0)
+    val endPos = population.max
+
+    def calc(minSum: Int, index: Int): Int = {
+      if (index > endPos) {
+        minSum
+      } else {
+          val sum = calcFn(population, index)
+          if (sum > minSum) minSum
+          else calc(sum, index + 1)
+      }
+    }
+    calc(startSum, 1)
+  }
+
+  def calcFuelLineary(population: Seq[Int], index: Int) =
+    population.map(pos => Math.abs(pos - index)).sum
+
+  def calcFuelExponentally(population: Seq[Int], index: Int) =
+    population.map(pos => calFuelDistance(Math.abs(pos - index))).sum
+
+  def calFuelDistance(distance: Int) = distance * (distance + 1) / 2
+
+  if (day == 7) {
+    val round1 = p2021_7(
+        "input_7.txt",
+        calcFuelLineary
+      )
+    val round2 = p2021_7(
+        "input_7.txt",
+        calcFuelExponentally
       )
     println(s"$round1, $round2")
   }
