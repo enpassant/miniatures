@@ -164,7 +164,7 @@ Either<Failure, DatabaseConfig> databaseConfigResult =
 Either<Failure, Repository> repositoryResult = databaseConfigResult.flatMap(databaseConfig ->
     Repository.load(databaseConfig.driver, databaseConfig.connectionUrl));
 
-Either<Failure, Repository> communicationConfigResult = repositoryResult.flatMap(repository ->
+Either<Failure, CommunicationConfig> communicationConfigResult = repositoryResult.flatMap(repository ->
     CommunicationConfig.loadFromDB(repository);
 
 communicationConfigResult.map(communicationConfig ->
