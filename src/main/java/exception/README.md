@@ -15,6 +15,10 @@ Sajnos, nem nyilvánvaló módon, rengeteg probléma forrása és a látszat ell
 
 Szerencsére van, az **Either konstrukció** használata. A következőkben egy kicsit megismerjük az Either konstrukciót, majd összehasonlítjuk a try-catch és az Either előnyeit, hátrányait.
 
+## Teljesítmény gondok az Exception esetén
+
+Kevesen tudják, de az Exception-ök előállítása, dobása és feldolgozása hatalmas memória és meginkább nagyon nagy CPU időbe kerül. [Itt egy teszt az Exception teljesítményéről.](https://www.baeldung.com/java-exceptions-performance)
+
 ## Either
 
 A cikknek nem célja az Either alapos ismertetése, csupán egy alapfokú ismeretet ad, amivel érthetővé válik a cikk további része.
